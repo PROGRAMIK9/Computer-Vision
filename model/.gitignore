@@ -1,0 +1,17 @@
+# Environment variables (API keys, etc.)
+.env
+
+# Data
+data/
+*.zip
+*.kaggle-partial
+
+# Saved Models
+saved_models/
+tfjs_model/
+tflite_model/
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
