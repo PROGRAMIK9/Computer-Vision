@@ -2,6 +2,10 @@ import os
 import argparse
 import subprocess
 import zipfile
+import sys
+from dotenv import load_dotenv
+
+load_dotenv()
 
 def download_dataset(dataset_name, download_path):
     if not os.path.exists(download_path):
@@ -9,8 +13,8 @@ def download_dataset(dataset_name, download_path):
 
     print(f"Downloading {dataset_name} to {download_path}...")
     try:
-        # Requires kaggle CLI to be installed and configured (~/.kaggle/kaggle.json)
-        subprocess.run(["kaggle", "datasets", "download", "-d", dataset_name, "-p", download_path], check=True)
+        # Requires kaggle API credentials configured (~/.kaggle/kaggle.json or KAGGLE_API_TOKEN)
+        subprocess.run([sys.executable, "-m", "kaggle", "datasets", "download", "-d", dataset_name, "-p", download_path], check=True)
         print("Download complete.")
         
         # Unzip the downloaded file
