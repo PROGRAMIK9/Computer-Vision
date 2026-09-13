@@ -1,0 +1,66 @@
+((.venv) ) abhi@fedora:~/Dev/Computer-Vision/model$ python 03_train.py \
+    --img_size 224 \
+    --batch_size 96 \
+    --epochs_phase1 2 \
+    --epochs_phase2 1 \
+    --output_dir ../final_models
+2026-09-14 02:25:40.352235: E external/local_xla/xla/stream_executor/cuda/cuda_fft.cc:467] Unable to register cuFFT factory: Attempting to register factory for plugin cuFFT when one has already been registered
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+E0000 00:00:1789332940.363916  104999 cuda_dnn.cc:8579] Unable to register cuDNN factory: Attempting to register factory for plugin cuDNN when one has already been registered
+E0000 00:00:1789332940.367545  104999 cuda_blas.cc:1407] Unable to register cuBLAS factory: Attempting to register factory for plugin cuBLAS when one has already been registered
+W0000 00:00:1789332940.378115  104999 computation_placer.cc:177] computation placer already registered. Please check linkage and avoid linking the same target more than once.
+W0000 00:00:1789332940.378144  104999 computation_placer.cc:177] computation placer already registered. Please check linkage and avoid linking the same target more than once.
+W0000 00:00:1789332940.378147  104999 computation_placer.cc:177] computation placer already registered. Please check linkage and avoid linking the same target more than once.
+W0000 00:00:1789332940.378152  104999 computation_placer.cc:177] computation placer already registered. Please check linkage and avoid linking the same target more than once.
+2026-09-14 02:25:40.381020: I tensorflow/core/platform/cpu_feature_guard.cc:210] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+To enable the following instructions: AVX2 FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
+
+GPU detected: 1
+  PhysicalDevice(name='/physical_device:GPU:0', device_type='GPU')
+Mixed precision enabled.
+Preparing datasets...
+Found 1266345 files belonging to 14 classes.
+Using 1139711 files for training.
+Using 126634 files for validation.
+I0000 00:00:1789332959.566623  104999 gpu_device.cc:2019] Created device /job:localhost/replica:0/task:0/device:GPU:0 with 3500 MB memory:  -> device: 0, name: NVIDIA GeForce RTX 4050 Laptop GPU, pci bus id: 0000:01:00.0, compute capability: 8.9
+Found classes: ['Abuse', 'Arrest', 'Arson', 'Assault', 'Burglary', 'Explosion', 'Fighting', 'NormalVideos', 'RoadAccidents', 'Robbery', 'Shooting', 'Shoplifting', 'Stealing', 'Vandalism']
+Normal class index is 7
+Calculated class weights: {0: 0.6680669741962167, 1: 1.9875022365079713}
+Building model...
+
+--- Phase 1: Training classification head ---
+/home/abhi/Dev/Computer-Vision/.venv/lib64/python3.12/site-packages/keras/src/trainers/epoch_iterator.py:74: UserWarning: `shuffle=True` was passed, but will be ignored since the data `x` was provided as a tf.data.Dataset. The Dataset is expected to already be shuffled (via `.shuffle(buffer_size)`).
+  self.data_adapter = data_adapters.get_data_adapter(
+Epoch 1/2
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+I0000 00:00:1789332965.889625  105268 service.cc:152] XLA service 0x7fa22c036d50 initialized for platform CUDA (this does not guarantee that XLA will be used). Devices:
+I0000 00:00:1789332965.889707  105268 service.cc:160]   StreamExecutor device (0): NVIDIA GeForce RTX 4050 Laptop GPU, Compute Capability 8.9
+2026-09-14 02:26:07.033798: I tensorflow/compiler/mlir/tensorflow/utils/dump_mlir_util.cc:269] disabling MLIR crash reproducer, set env var `MLIR_CRASH_REPRODUCER_DIRECTORY` to enable.
+I0000 00:00:1789332968.088910  105268 cuda_dnn.cc:529] Loaded cuDNN version 90300
+I0000 00:00:1789332974.081880  105268 device_compiler.h:188] Compiled cluster using XLA!  This line is logged at most once for the lifetime of the process.
+11872/11872 ━━━━━━━━━━━━━━━━━━━━ 0s 21ms/step - accuracy: 0.9816 - auc: 0.9983 - loss: 0.0495 - precision: 0.9444 - recall: 0.98462026-09-14 02:30:17.306006: I external/local_xla/xla/stream_executor/cuda/subprocess_compilation.cc:346] ptxas warning : Registers are spilled to local memory in function 'gemm_fusion_dot_1548', 72 bytes spill stores, 72 bytes spill loads
+
+2026-09-14 02:30:17.373844: I external/local_xla/xla/stream_executor/cuda/subprocess_compilation.cc:346] ptxas warning : Registers are spilled to local memory in function 'gemm_fusion_dot_1548_0', 468 bytes spill stores, 408 bytes spill loads
+
+2026-09-14 02:30:17.421601: I external/local_xla/xla/stream_executor/cuda/subprocess_compilation.cc:346] ptxas warning : Registers are spilled to local memory in function 'gemm_fusion_dot_1548', 808 bytes spill stores, 716 bytes spill loads
+
+2026-09-14 02:30:17.449174: I external/local_xla/xla/stream_executor/cuda/subprocess_compilation.cc:346] ptxas warning : Registers are spilled to local memory in function 'gemm_fusion_dot_1548', 388 bytes spill stores, 388 bytes spill loads
+
+2026-09-14 02:30:17.470016: I external/local_xla/xla/stream_executor/cuda/subprocess_compilation.cc:346] ptxas warning : Registers are spilled to local memory in function 'gemm_fusion_dot_1548', 300 bytes spill stores, 308 bytes spill loads
+
+2026-09-14 02:30:37.974849: I external/local_xla/xla/stream_executor/cuda/subprocess_compilation.cc:346] ptxas warning : Registers are spilled to local memory in function 'gemm_fusion_dot_1548', 128 bytes spill stores, 128 bytes spill loads
+
+2026-09-14 02:30:38.050250: I external/local_xla/xla/stream_executor/cuda/subprocess_compilation.cc:346] ptxas warning : Registers are spilled to local memory in function 'gemm_fusion_dot_1548', 400 bytes spill stores, 400 bytes spill loads
+
+11872/11872 ━━━━━━━━━━━━━━━━━━━━ 281s 24ms/step - accuracy: 0.9816 - auc: 0.9983 - loss: 0.0495 - precision: 0.9444 - recall: 0.9846 - val_accuracy: 0.9950 - val_auc: 0.9998 - val_loss: 0.0143 - val_precision: 0.9825 - val_recall: 0.9981
+Epoch 2/2
+2026-09-14 02:30:42.960153: W tensorflow/core/kernels/data/prefetch_autotuner.cc:52] Prefetch autotuner tried to allocate 67109632 bytes after encountering the first element of size 67109632 bytes.This already causes the autotune ram budget to be exceeded. To stay within the ram budget, either increase the ram budget or reduce element size
+11872/11872 ━━━━━━━━━━━━━━━━━━━━ 174s 15ms/step - accuracy: 0.9945 - auc: 0.9996 - loss: 0.0152 - precision: 0.9828 - recall: 0.9955 - val_accuracy: 0.9968 - val_auc: 0.9998 - val_loss: 0.0088 - val_precision: 0.9906 - val_recall: 0.9970
+
+--- Phase 2: Fine-tuning top layers of base model ---
+Epoch 3/3
+2026-09-14 02:33:41.640859: W tensorflow/core/kernels/data/prefetch_autotuner.cc:52] Prefetch autotuner tried to allocate 67109632 bytes after encountering the first element of size 67109632 bytes.This already causes the autotune ram budget to be exceeded. To stay within the ram budget, either increase the ram budget or reduce element size
+11872/11872 ━━━━━━━━━━━━━━━━━━━━ 196s 16ms/step - accuracy: 0.9977 - auc: 0.9999 - loss: 0.0060 - precision: 0.9924 - recall: 0.9986 - val_accuracy: 0.9983 - val_auc: 0.9999 - val_loss: 0.0044 - val_precision: 0.9941 - val_recall: 0.9991 - learning_rate: 1.0000e-05
+Training complete. Best model saved to ../final_models/model_final.keras
+((.venv) ) abhi@fedora:~/Dev/Computer-Vision/model$ ^C
+((.venv) ) abhi@fedora:~/Dev/Computer-Vision/model$ 

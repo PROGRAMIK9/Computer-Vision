@@ -1,0 +1,80 @@
+((.venv) ) abhi@fedora:~/Dev/Computer-Vision/model$ python 04_evaluate.py \
+    --data_dir ../data \
+    --model_path ../final_models/model_final.keras \
+    --img_size 224 \
+    --batch_size 96
+2026-09-14 02:40:57.824030: E external/local_xla/xla/stream_executor/cuda/cuda_fft.cc:467] Unable to register cuFFT factory: Attempting to register factory for plugin cuFFT when one has already been registered
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+E0000 00:00:1789333857.837569  113964 cuda_dnn.cc:8579] Unable to register cuDNN factory: Attempting to register factory for plugin cuDNN when one has already been registered
+E0000 00:00:1789333857.841584  113964 cuda_blas.cc:1407] Unable to register cuBLAS factory: Attempting to register factory for plugin cuBLAS when one has already been registered
+W0000 00:00:1789333857.854645  113964 computation_placer.cc:177] computation placer already registered. Please check linkage and avoid linking the same target more than once.
+W0000 00:00:1789333857.854683  113964 computation_placer.cc:177] computation placer already registered. Please check linkage and avoid linking the same target more than once.
+W0000 00:00:1789333857.854686  113964 computation_placer.cc:177] computation placer already registered. Please check linkage and avoid linking the same target more than once.
+W0000 00:00:1789333857.854688  113964 computation_placer.cc:177] computation placer already registered. Please check linkage and avoid linking the same target more than once.
+2026-09-14 02:40:57.857821: I tensorflow/core/platform/cpu_feature_guard.cc:210] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+To enable the following instructions: AVX2 FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
+Loading test dataset...
+Found 111308 files belonging to 14 classes.
+I0000 00:00:1789333862.203574  113964 gpu_device.cc:2019] Created device /job:localhost/replica:0/task:0/device:GPU:0 with 3473 MB memory:  -> device: 0, name: NVIDIA GeForce RTX 4050 Laptop GPU, pci bus id: 0000:01:00.0, compute capability: 8.9
+Classes: ['Abuse', 'Arrest', 'Arson', 'Assault', 'Burglary', 'Explosion', 'Fighting', 'NormalVideos', 'RoadAccidents', 'Robbery', 'Shooting', 'Shoplifting', 'Stealing', 'Vandalism']
+Normal class index: 7
+Loading model from ../final_models/model_final.keras...
+/home/abhi/Dev/Computer-Vision/.venv/lib64/python3.12/site-packages/keras/src/saving/saving_lib.py:869: UserWarning: Skipping variable loading for optimizer 'adam_1', because it has 26 variables whereas the saved optimizer has 30 variables. 
+  saveable.load_own_variables(store)
+Evaluating...
+2026-09-14 02:41:03.828922: I tensorflow/core/framework/local_rendezvous.cc:407] Local rendezvous is aborting with status: OUT_OF_RANGE: End of sequence
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+I0000 00:00:1789333865.329512  114099 service.cc:152] XLA service 0x7f9794003ae0 initialized for platform CUDA (this does not guarantee that XLA will be used). Devices:
+I0000 00:00:1789333865.329539  114099 service.cc:160]   StreamExecutor device (0): NVIDIA GeForce RTX 4050 Laptop GPU, Compute Capability 8.9
+2026-09-14 02:41:05.362481: I tensorflow/compiler/mlir/tensorflow/utils/dump_mlir_util.cc:269] disabling MLIR crash reproducer, set env var `MLIR_CRASH_REPRODUCER_DIRECTORY` to enable.
+I0000 00:00:1789333865.635926  114099 cuda_dnn.cc:529] Loaded cuDNN version 90300
+2026-09-14 02:41:06.159474: I external/local_xla/xla/stream_executor/cuda/subprocess_compilation.cc:346] ptxas warning : Registers are spilled to local memory in function 'gemm_fusion_dot_1470', 8 bytes spill stores, 8 bytes spill loads
+
+2026-09-14 02:41:06.175216: I external/local_xla/xla/stream_executor/cuda/subprocess_compilation.cc:346] ptxas warning : Registers are spilled to local memory in function 'gemm_fusion_dot_1470', 4 bytes spill stores, 4 bytes spill loads
+
+2026-09-14 02:41:06.393510: I external/local_xla/xla/stream_executor/cuda/subprocess_compilation.cc:346] ptxas warning : Registers are spilled to local memory in function 'gemm_fusion_dot_1470', 256 bytes spill stores, 256 bytes spill loads
+
+2026-09-14 02:41:06.416471: I external/local_xla/xla/stream_executor/cuda/subprocess_compilation.cc:346] ptxas warning : Registers are spilled to local memory in function 'gemm_fusion_dot_1470', 388 bytes spill stores, 388 bytes spill loads
+
+I0000 00:00:1789333870.820656  114099 device_compiler.h:188] Compiled cluster using XLA!  This line is logged at most once for the lifetime of the process.
+2026-09-14 02:41:10.895209: I tensorflow/core/framework/local_rendezvous.cc:407] Local rendezvous is aborting with status: OUT_OF_RANGE: End of sequence
+2026-09-14 02:41:11.025962: I tensorflow/core/framework/local_rendezvous.cc:407] Local rendezvous is aborting with status: OUT_OF_RANGE: End of sequence
+2026-09-14 02:41:11.286931: I tensorflow/core/framework/local_rendezvous.cc:407] Local rendezvous is aborting with status: OUT_OF_RANGE: End of sequence
+2026-09-14 02:41:11.830027: I tensorflow/core/framework/local_rendezvous.cc:407] Local rendezvous is aborting with status: OUT_OF_RANGE: End of sequence
+2026-09-14 02:41:12.973440: I tensorflow/core/framework/local_rendezvous.cc:407] Local rendezvous is aborting with status: OUT_OF_RANGE: End of sequence
+2026-09-14 02:41:15.256853: I tensorflow/core/framework/local_rendezvous.cc:407] Local rendezvous is aborting with status: OUT_OF_RANGE: End of sequence
+2026-09-14 02:41:19.902473: I tensorflow/core/framework/local_rendezvous.cc:407] Local rendezvous is aborting with status: OUT_OF_RANGE: End of sequence
+2026-09-14 02:41:29.699353: I tensorflow/core/framework/local_rendezvous.cc:407] Local rendezvous is aborting with status: OUT_OF_RANGE: End of sequence
+2026-09-14 02:41:48.860585: I tensorflow/core/framework/local_rendezvous.cc:407] Local rendezvous is aborting with status: OUT_OF_RANGE: End of sequence
+2026-09-14 02:42:26.241892: I tensorflow/core/framework/local_rendezvous.cc:407] Local rendezvous is aborting with status: OUT_OF_RANGE: End of sequence
+2026-09-14 02:42:37.648459: I external/local_xla/xla/stream_executor/cuda/subprocess_compilation.cc:346] ptxas warning : Registers are spilled to local memory in function 'gemm_fusion_dot_1485', 128 bytes spill stores, 128 bytes spill loads
+
+2026-09-14 02:42:37.797391: I external/local_xla/xla/stream_executor/cuda/subprocess_compilation.cc:346] ptxas warning : Registers are spilled to local memory in function 'gemm_fusion_dot_1485', 400 bytes spill stores, 400 bytes spill loads
+
+
+--- Overall Binary Classification Metrics ---
+Accuracy:  0.7092
+Precision: 0.6205
+Recall:    0.7768
+F1 Score:  0.6899
+
+--- Confusion Matrix ---
+[[42930 22022]
+ [10347 36009]]
+Saved confusion matrix plot to ../final_models/confusion_matrix.png
+
+--- Per-Class Anomaly Detection Rate ---
+Abuse (Anomaly): 153/297 correctly identified as Anomaly (51.52%)
+Arrest (Anomaly): 2176/3365 correctly identified as Anomaly (64.67%)
+Arson (Anomaly): 2760/2793 correctly identified as Anomaly (98.82%)
+Assault (Anomaly): 2073/2657 correctly identified as Anomaly (78.02%)
+Burglary (Anomaly): 6388/7657 correctly identified as Anomaly (83.43%)
+Explosion (Anomaly): 5670/6510 correctly identified as Anomaly (87.10%)
+Fighting (Anomaly): 667/1231 correctly identified as Anomaly (54.18%)
+NormalVideos (Normal): 42930/64952 correctly identified as Normal (66.09%)
+RoadAccidents (Anomaly): 1696/2663 correctly identified as Anomaly (63.69%)
+Robbery (Anomaly): 427/835 correctly identified as Anomaly (51.14%)
+Shooting (Anomaly): 6223/7630 correctly identified as Anomaly (81.56%)
+Shoplifting (Anomaly): 5645/7623 correctly identified as Anomaly (74.05%)
+Stealing (Anomaly): 1152/1984 correctly identified as Anomaly (58.06%)
+Vandalism (Anomaly): 979/1111 correctly identified as Anomaly (88.12%)
