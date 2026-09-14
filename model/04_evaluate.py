@@ -28,10 +28,15 @@ def evaluate(data_dir, model_path, img_size, batch_size):
     )
     
     class_names = test_ds_raw.class_names
-    if "Normal" in class_names:
-        normal_idx = class_names.index("Normal")
-    else:
-        normal_idx = [i for i, c in enumerate(class_names) if c.lower() == 'normal'][0]
+    normal_candidates = ["Normal", "NormalVideos"]
+
+    normal_idx = next(
+        (i for i, c in enumerate(class_names) if c.lower() in [x.lower() for x in normal_candidates]),
+        None
+    )
+
+    if normal_idx is None:
+        raise ValueError(f"Could not find normal class. Classes found: {class_names}")
         
     print(f"Classes: {class_names}")
     print(f"Normal class index: {normal_idx}")

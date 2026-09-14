@@ -55,7 +55,7 @@ def explore_data(data_dir):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Explore dataset class distribution.")
-    parser.add_argument("--data_dir", type=str, default="./data", help="Directory where the dataset is located")
+    parser.add_argument("--data_dir", type=str, default="../data", help="Directory where the dataset is located")
     args = parser.parse_args()
     
     explore_data(args.data_dir)

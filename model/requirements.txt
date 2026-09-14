@@ -1,4 +1,4 @@
-tensorflow
+tensorflow[and-cuda]==2.19.0
 tensorflowjs
 kaggle
 matplotlib
