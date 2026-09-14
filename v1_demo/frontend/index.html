@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>V1 Anomaly Detection</title>
+
+    <link
+        rel="stylesheet"
+        href="/static/style.css"
+    >
+
+</head>
+
+
+<body>
+
+<div class="app">
+
+    <!-- ======================================================
+         Header
+         ====================================================== -->
+
+    <header>
+
+        <div class="header-left">
+
+            <div class="eyebrow">
+                COMPUTER VISION · BASELINE MODEL
+            </div>
+
+            <h1>
+                V1 Anomaly Detection
+            </h1>
+
+            <p>
+                Independent frame-by-frame analysis
+            </p>
+
+        </div>
+
+        <div class="model-badge">
+            V1
+        </div>
+
+    </header>
+
+
+    <!-- ======================================================
+         Main two-column layout
+         ====================================================== -->
+
+    <main>
+
+
+        <!-- ==================================================
+             LEFT: VIDEO / INPUT
+             ================================================== -->
+
+        <section class="panel video-panel">
+            <!-- Video controls -->
+
+            <div class="input-grid">
+
+                <div class="field">
+
+                    <label>
+                        CATEGORY
+                    </label>
+
+                    <select id="classSelect">
+                        <option>
+                            Loading...
+                        </option>
+                    </select>
+
+                </div>
+
+
+                <div class="field">
+
+                    <label>
+                        VIDEO
+                    </label>
+
+                    <select id="videoSelect">
+                        <option>
+                            Loading...
+                        </option>
+                    </select>
+
+                </div>
+
+            </div>
+
+
+            <!-- Image -->
+
+            <div class="image-area">
+
+                <img
+                    id="frameImage"
+                    alt="Current video frame"
+                >
+
+                <div
+                    id="loading"
+                    class="loading"
+                >
+                    Loading frame...
+                </div>
+
+            </div>
+
+
+            <!-- Timeline -->
+
+            <div class="timeline-header">
+
+                <span>
+                    FRAME TIMELINE
+                </span>
+
+                <span id="timelinePosition">
+                    0 / 0
+                </span>
+
+            </div>
+
+
+            <div class="timeline">
+
+                <input
+                    id="frameSlider"
+                    type="range"
+                    min="0"
+                    max="0"
+                    value="0"
+                >
+
+            </div>
+
+
+            <!-- Playback -->
+
+            <div class="playback-row">
+
+                <button id="previousButton">
+                    ◀
+                </button>
+
+                <button
+                    id="playButton"
+                    class="play"
+                >
+                    ▶ Play
+                </button>
+
+                <button id="nextButton">
+                    ▶
+                </button>
+
+
+                <div class="speed-control">
+
+                    <span>
+                        Speed
+                    </span>
+
+                    <select id="speedSelect">
+
+                        <option value="1000">
+                            0.5×
+                        </option>
+
+                        <option
+                            value="500"
+                            selected
+                        >
+                            1×
+                        </option>
+
+                        <option value="250">
+                            2×
+                        </option>
+
+                        <option value="125">
+                            4×
+                        </option>
+
+                    </select>
+
+                </div>
+
+            </div>
+
+            <!-- Video statistics -->
+
+            <div class="video-stats">
+
+                <div class="stat">
+
+                    <span>
+                        Current Frame
+                    </span>
+
+                    <strong id="frameNumber">
+                        Frame 0 / 0
+                    </strong>
+
+                </div>
+
+
+                <div class="stat">
+
+                    <span>
+                        Source Frame
+                    </span>
+
+                    <strong id="sourceFrame">
+                        -
+                    </strong>
+
+                </div>
+
+
+                <div class="stat">
+
+                    <span>
+                        Filename
+                    </span>
+
+                    <strong
+                        id="filename"
+                        class="filename"
+                    >
+                        -
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+            <!-- Input information -->
+
+            <div class="info-card">
+
+                <div class="info-title">
+                    INPUT PIPELINE
+                </div>
+
+                <div class="pipeline">
+
+                    <div class="pipeline-step">
+
+                        <span>
+                            Source
+                        </span>
+
+                        <strong>
+                            Video Frame
+                        </strong>
+
+                    </div>
+
+                    <div class="pipeline-arrow">
+                        →
+                    </div>
+
+                    <div class="pipeline-step">
+
+                        <span>
+                            Resize
+                        </span>
+
+                        <strong>
+                            224 × 224
+                        </strong>
+
+                    </div>
+
+                    <div class="pipeline-arrow">
+                        →
+                    </div>
+
+                    <div class="pipeline-step">
+
+                        <span>
+                            Input
+                        </span>
+
+                        <strong>
+                            RGB Image
+                        </strong>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- ==================================================
+             RIGHT: MODEL / OUTPUT
+             ================================================== -->
+
+        <section class="panel model-panel">
+
+            <div class="panel-header">
+
+                <div>
+
+                    <div class="section-label">
+                        MODEL / OUTPUT
+                    </div>
+
+                    <h2>
+                        V1 Model
+                    </h2>
+
+                </div>
+
+                <div class="status">
+                    ACTIVE
+                </div>
+
+            </div>
+
+
+            <!-- Current prediction -->
+
+            <div
+                id="predictionCard"
+                class="prediction-card"
+            >
+
+                <div class="prediction-caption">
+                    CURRENT ASSESSMENT
+                </div>
+
+                <div
+                    id="predictionLabel"
+                    class="prediction-label"
+                >
+                    -
+                </div>
+
+                <div
+                    id="confidence"
+                    class="confidence-caption"
+                >
+                    -
+                </div>
+
+                <div class="confidence-caption">
+                    Anomaly Probability
+                </div>
+
+            </div>
+
+
+            <!-- Model details -->
+
+            <div class="model-details">
+
+                <div class="detail">
+
+                    <span>
+                        Architecture
+                    </span>
+
+                    <strong>
+                        MobileNetV3Small
+                    </strong>
+
+                </div>
+
+
+                <div class="detail">
+
+                    <span>
+                        Input
+                    </span>
+
+                    <strong>
+                        224 × 224 × 3
+                    </strong>
+
+                </div>
+
+
+                <div class="detail">
+
+                    <span>
+                        Output
+                    </span>
+
+                    <strong>
+                        Binary Probability
+                    </strong>
+
+                </div>
+
+
+                <div class="detail">
+
+                    <span>
+                        Threshold
+                    </span>
+
+                    <strong>
+                        0.5000
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+            <!-- Architecture -->
+
+            <div class="architecture-card">
+
+                <div class="card-title">
+                    MODEL ARCHITECTURE
+                </div>
+
+                <div class="architecture">
+
+                    <div class="architecture-node">
+
+                        <span>
+                            BACKBONE
+                        </span>
+
+                        <strong>
+                            MobileNetV3Small
+                        </strong>
+
+                    </div>
+
+
+                    <div class="architecture-arrow">
+                        ↓
+                    </div>
+
+
+                    <div class="architecture-node">
+
+                        <span>
+                            FEATURE EXTRACTION
+                        </span>
+
+                        <strong>
+                            Global Average Pooling
+                        </strong>
+
+                    </div>
+
+
+                    <div class="architecture-arrow">
+                        ↓
+                    </div>
+
+
+                    <div class="architecture-node">
+
+                        <span>
+                            CLASSIFIER
+                        </span>
+
+                        <strong>
+                            Dense 128 · ReLU
+                        </strong>
+
+                    </div>
+
+
+                    <div class="architecture-arrow">
+                        ↓
+                    </div>
+
+
+                    <div class="architecture-node">
+
+                        <span>
+                            OUTPUT
+                        </span>
+
+                        <strong>
+                            Sigmoid · 1 Neuron
+                        </strong>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- Model output -->
+
+            <div class="output-grid">
+
+                <div class="output-box">
+
+                    <span>
+                        RAW MODEL OUTPUT
+                    </span>
+
+                    <strong id="rawPrediction">
+                        -
+                    </strong>
+
+                </div>
+
+
+                <div class="output-box">
+
+                    <span>
+                        DECISION THRESHOLD
+                    </span>
+
+                    <strong>
+                        0.5000
+                    </strong>
+
+                </div>
+
+
+                <div class="output-box">
+
+                    <span>
+                        FINAL DECISION
+                    </span>
+
+                    <strong id="decision">
+                        -
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+            <!-- Probabilities -->
+
+            <div class="probability-card">
+
+                <div class="card-title">
+                    CLASS PROBABILITIES
+                </div>
+
+
+                <div class="probability-row">
+
+                    <div class="probability-label">
+
+                        <span>
+                            Normal
+                        </span>
+
+                        <strong id="normalProbability">
+                            -
+                        </strong>
+
+                    </div>
+
+                    <div class="probability-bar">
+
+                        <div
+                            id="normalBar"
+                            class="probability-fill"
+                        ></div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="probability-row">
+
+                    <div class="probability-label">
+
+                        <span>
+                            Anomaly
+                        </span>
+
+                        <strong id="anomalyProbability">
+                            -
+                        </strong>
+
+                    </div>
+
+                    <div class="probability-bar">
+
+                        <div
+                            id="anomalyBar"
+                            class="probability-fill"
+                        ></div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- Explanation -->
+
+            <div class="explanation-card">
+
+                <div class="card-title">
+                    V1 BEHAVIOR
+                </div>
+
+                <p>
+                    The model evaluates each frame
+                    independently.
+                </p>
+
+                <p>
+                    No previous or future frames are
+                    provided to the model.
+                </p>
+
+                <p class="highlight">
+                    Each prediction is based only on
+                    the current frame.
+                </p>
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <!-- ======================================================
+         Footer
+         ====================================================== -->
+
+    <footer>
+
+        <span>
+            V1 · MobileNetV3Small
+        </span>
+
+        <span>
+            Frame-by-frame binary anomaly detection
+        </span>
+
+        <span>
+            Threshold: 0.5
+        </span>
+
+    </footer>
+
+</div>
+
+<!-- Compatibility elements used by app.js -->
+<div style="display:none;">
+    <span id="sideClass"></span>
+    <span id="sideVideo"></span>
+    <span id="sideFrames"></span>
+</div>  
+
+<script src="/static/app.js"></script>
+
+</body>
+
+</html>

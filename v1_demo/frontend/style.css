@@ -1,0 +1,972 @@
+* {
+    box-sizing: border-box;
+}
+
+
+body {
+    margin: 0;
+
+    background: #090b0e;
+    color: #f1f3f5;
+
+    font-family:
+        Inter,
+        ui-sans-serif,
+        system-ui,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        sans-serif;
+}
+
+
+.app {
+    width: min(1500px, 94%);
+    margin: auto;
+}
+
+
+/* ============================================================
+   HEADER
+   ============================================================ */
+
+header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    padding: 32px 0 25px;
+
+    border-bottom: 1px solid #252a31;
+}
+
+
+.eyebrow {
+    color: #737b86;
+
+    font-size: 10px;
+    font-weight: 800;
+
+    letter-spacing: 2px;
+}
+
+
+h1 {
+    margin: 5px 0;
+
+    font-size: 30px;
+    line-height: 1.15;
+}
+
+
+header p {
+    margin: 0;
+
+    color: #858d98;
+
+    font-size: 14px;
+}
+
+
+.model-badge {
+    padding: 9px 16px;
+
+    border: 1px solid #414750;
+    border-radius: 999px;
+
+    font-size: 12px;
+    font-weight: 800;
+
+    letter-spacing: 1.5px;
+}
+
+
+/* ============================================================
+   MAIN
+   ============================================================ */
+
+main {
+    display: grid;
+
+    grid-template-columns:
+        minmax(0, 1.5fr)
+        minmax(360px, 0.85fr);
+
+    gap: 20px;
+
+    padding: 24px 0;
+}
+
+
+.panel {
+    min-width: 0;
+
+    padding: 20px;
+
+    border: 1px solid #282d34;
+    border-radius: 14px;
+
+    background: #111419;
+}
+
+
+/* ============================================================
+   PANEL HEADER
+   ============================================================ */
+
+.panel-header {
+    display: flex;
+
+    justify-content: space-between;
+    align-items: flex-start;
+
+    margin-bottom: 20px;
+}
+
+
+.section-label {
+    color: #737b86;
+
+    font-size: 10px;
+    font-weight: 800;
+
+    letter-spacing: 1.7px;
+}
+
+
+h2 {
+    margin: 4px 0 0;
+
+    font-size: 20px;
+}
+
+
+.status {
+    padding: 6px 10px;
+
+    border: 1px solid #394047;
+    border-radius: 6px;
+
+    color: #a6adb6;
+
+    font-size: 9px;
+    font-weight: 800;
+
+    letter-spacing: 1px;
+}
+
+
+/* ============================================================
+   INPUT CONTROLS
+   ============================================================ */
+
+.input-grid {
+    display: grid;
+
+    grid-template-columns:
+        1fr
+        1.3fr;
+
+    gap: 12px;
+
+    margin-bottom: 15px;
+}
+
+
+.field {
+    display: flex;
+    flex-direction: column;
+
+    gap: 6px;
+}
+
+
+.field label {
+    color: #737b86;
+
+    font-size: 10px;
+    font-weight: 800;
+
+    letter-spacing: 1px;
+}
+
+
+select {
+    width: 100%;
+
+    padding: 10px 12px;
+
+    border: 1px solid #30353d;
+    border-radius: 7px;
+
+    background: #171a20;
+    color: #f1f3f5;
+
+    outline: none;
+
+    font-size: 13px;
+}
+
+
+select:focus {
+    border-color: #555c66;
+}
+
+
+/* ============================================================
+   VIDEO STATS
+   ============================================================ */
+
+.video-stats {
+    display: grid;
+
+    grid-template-columns:
+        1fr
+        1fr
+        1.5fr;
+
+    margin-bottom: 14px;
+
+    border: 1px solid #282d34;
+    border-radius: 8px;
+
+    overflow: hidden;
+}
+
+
+.stat {
+    min-width: 0;
+
+    padding: 11px 13px;
+
+    border-right: 1px solid #282d34;
+}
+
+
+.stat:last-child {
+    border-right: none;
+}
+
+
+.stat span {
+    display: block;
+
+    margin-bottom: 4px;
+
+    color: #6f7782;
+
+    font-size: 9px;
+    font-weight: 700;
+
+    letter-spacing: 0.8px;
+}
+
+
+.stat strong {
+    display: block;
+
+    color: #e9ebee;
+
+    font-size: 12px;
+}
+
+
+.filename {
+    overflow: hidden;
+
+    text-overflow: ellipsis;
+
+    white-space: nowrap;
+}
+
+
+/* ============================================================
+   IMAGE
+   ============================================================ */
+
+.image-area {
+    position: relative;
+
+    width: 100%;
+    height: 530px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    background: #060709;
+
+    border: 1px solid #242930;
+    border-radius: 9px;
+
+    overflow: hidden;
+}
+
+
+.image-area img {
+    width: 100%;
+    height: 100%;
+
+    object-fit: contain;
+}
+
+
+.loading {
+    position: absolute;
+
+    display: none;
+
+    color: #858d98;
+
+    font-size: 13px;
+}
+
+
+/* ============================================================
+   TIMELINE
+   ============================================================ */
+
+.timeline-header {
+    display: flex;
+
+    justify-content: space-between;
+
+    margin-top: 18px;
+    margin-bottom: 7px;
+
+    color: #737b86;
+
+    font-size: 9px;
+    font-weight: 800;
+
+    letter-spacing: 1px;
+}
+
+
+.timeline input {
+    width: 100%;
+}
+
+
+/* ============================================================
+   PLAYBACK
+   ============================================================ */
+
+.playback-row {
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    gap: 8px;
+
+    margin-top: 15px;
+}
+
+
+button {
+    min-width: 45px;
+
+    padding: 10px 14px;
+
+    border: 1px solid #343a42;
+    border-radius: 7px;
+
+    background: #181b20;
+    color: #f1f3f5;
+
+    cursor: pointer;
+
+    font-size: 13px;
+}
+
+
+button:hover {
+    background: #22262c;
+}
+
+
+button.play {
+    min-width: 105px;
+
+    font-weight: 700;
+}
+
+
+.speed-control {
+    display: flex;
+
+    align-items: center;
+
+    gap: 8px;
+
+    margin-left: 12px;
+
+    padding-left: 12px;
+
+    border-left: 1px solid #2b3037;
+}
+
+
+.speed-control span {
+    color: #737b86;
+
+    font-size: 10px;
+}
+
+
+.speed-control select {
+    width: 75px;
+
+    min-width: 75px;
+
+    padding: 8px;
+}
+
+
+/* ============================================================
+   INFORMATION CARD
+   ============================================================ */
+
+.info-card,
+.architecture-card,
+.probability-card,
+.explanation-card {
+    margin-top: 15px;
+
+    padding: 15px;
+
+    border: 1px solid #282d34;
+    border-radius: 9px;
+
+    background: #0d0f13;
+}
+
+
+.info-title,
+.card-title {
+    margin-bottom: 13px;
+
+    color: #737b86;
+
+    font-size: 9px;
+    font-weight: 800;
+
+    letter-spacing: 1.4px;
+}
+
+
+.pipeline {
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 8px;
+}
+
+
+.pipeline-step {
+    flex: 1;
+
+    padding: 10px;
+
+    text-align: center;
+
+    border: 1px solid #30353b;
+    border-radius: 7px;
+}
+
+
+.pipeline-step span {
+    display: block;
+
+    color: #6f7782;
+
+    font-size: 8px;
+
+    letter-spacing: 0.7px;
+}
+
+
+.pipeline-step strong {
+    display: block;
+
+    margin-top: 4px;
+
+    font-size: 11px;
+}
+
+
+.pipeline-arrow {
+    color: #5e6670;
+
+    font-size: 15px;
+}
+
+
+/* ============================================================
+   MODEL DETAILS
+   ============================================================ */
+
+.model-details {
+    display: grid;
+
+    grid-template-columns:
+        1fr
+        1fr;
+
+    border: 1px solid #282d34;
+    border-radius: 9px;
+
+    overflow: hidden;
+}
+
+
+.detail {
+    padding: 12px;
+
+    border-right: 1px solid #282d34;
+    border-bottom: 1px solid #282d34;
+}
+
+
+.detail:nth-child(2n) {
+    border-right: none;
+}
+
+
+.detail:nth-last-child(-n+2) {
+    border-bottom: none;
+}
+
+
+.detail span {
+    display: block;
+
+    color: #6f7782;
+
+    font-size: 9px;
+}
+
+
+.detail strong {
+    display: block;
+
+    margin-top: 5px;
+
+    font-size: 12px;
+}
+
+
+/* ============================================================
+   ARCHITECTURE
+   ============================================================ */
+
+.architecture {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 5px;
+}
+
+
+.architecture-node {
+    padding: 10px;
+
+    text-align: center;
+
+    border: 1px solid #30353b;
+    border-radius: 7px;
+}
+
+
+.architecture-node span {
+    display: block;
+
+    color: #6f7782;
+
+    font-size: 8px;
+    font-weight: 700;
+
+    letter-spacing: 0.8px;
+}
+
+
+.architecture-node strong {
+    display: block;
+
+    margin-top: 4px;
+
+    font-size: 12px;
+}
+
+
+.architecture-arrow {
+    color: #5d6570;
+
+    text-align: center;
+
+    font-size: 13px;
+}
+
+
+/* ============================================================
+   PREDICTION
+   ============================================================ */
+
+.prediction-card {
+    margin-top: 15px;
+
+    padding: 25px 15px;
+
+    text-align: center;
+
+    border: 1px solid #30353b;
+    border-radius: 9px;
+
+    background: #0b0d10;
+}
+
+
+.prediction-caption {
+    color: #6f7782;
+
+    font-size: 9px;
+    font-weight: 800;
+
+    letter-spacing: 1.4px;
+}
+
+
+.prediction-label {
+    margin-top: 8px;
+
+    font-size: 28px;
+    font-weight: 850;
+
+    letter-spacing: 1px;
+}
+
+
+.confidence {
+    margin-top: 3px;
+
+    font-size: 38px;
+    font-weight: 750;
+}
+
+
+.confidence-caption {
+    margin-top: 2px;
+    display: inline-block;
+
+    color: #737b86;
+
+    font-size: 16px;
+}
+
+
+.prediction-card.anomaly {
+    border-color: #713939;
+}
+
+
+.prediction-card.anomaly
+.prediction-label {
+    color: #ff7777;
+}
+
+
+.prediction-card.anomaly
+.confidence {
+    color: #ff8c8c;
+}
+
+
+/* ============================================================
+   OUTPUT GRID
+   ============================================================ */
+
+.output-grid {
+    display: grid;
+
+    grid-template-columns:
+        1fr
+        1fr
+        1fr;
+
+    margin-top: 12px;
+
+    border: 1px solid #282d34;
+    border-radius: 8px;
+
+    overflow: hidden;
+}
+
+
+.output-box {
+    min-width: 0;
+
+    padding: 11px;
+
+    border-right: 1px solid #282d34;
+}
+
+
+.output-box:last-child {
+    border-right: none;
+}
+
+
+.output-box span {
+    display: block;
+
+    color: #6f7782;
+
+    font-size: 8px;
+    font-weight: 700;
+
+    letter-spacing: 0.6px;
+}
+
+
+.output-box strong {
+    display: block;
+
+    margin-top: 5px;
+
+    overflow: hidden;
+
+    text-overflow: ellipsis;
+
+    white-space: nowrap;
+
+    font-size: 13px;
+}
+
+
+/* ============================================================
+   PROBABILITIES
+   ============================================================ */
+
+.probability-row {
+    margin-top: 12px;
+}
+
+
+.probability-label {
+    display: flex;
+
+    justify-content: space-between;
+
+    margin-bottom: 5px;
+
+    color: #858d98;
+
+    font-size: 10px;
+}
+
+
+.probability-label strong {
+    color: #e7e9eb;
+}
+
+
+.probability-bar {
+    height: 6px;
+
+    background: #24282e;
+
+    border-radius: 99px;
+
+    overflow: hidden;
+}
+
+
+.probability-fill {
+    width: 0%;
+    height: 100%;
+
+    background: #7b838e;
+
+    border-radius: 99px;
+
+    transition: width 0.2s ease;
+}
+
+
+/* ============================================================
+   EXPLANATION
+   ============================================================ */
+
+.explanation-card p {
+    margin: 8px 0;
+
+    color: #858d98;
+
+    font-size: 11px;
+    line-height: 1.5;
+}
+
+
+.explanation-card p:first-of-type {
+    margin-top: 0;
+}
+
+
+.explanation-card .highlight {
+    color: #d6d9dd;
+
+    font-weight: 600;
+}
+
+
+/* ============================================================
+   FOOTER
+   ============================================================ */
+
+footer {
+    display: flex;
+
+    justify-content: space-between;
+
+    padding: 20px 0 28px;
+
+    border-top: 1px solid #252a31;
+
+    color: #626a75;
+
+    font-size: 10px;
+}
+
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+
+@media (max-width: 1050px) {
+
+    main {
+        grid-template-columns: 1fr;
+    }
+
+    .model-panel {
+        display: grid;
+
+        grid-template-columns:
+            1fr
+            1fr;
+
+        gap: 15px;
+    }
+
+    .model-panel .panel-header,
+    .model-panel .prediction-card {
+        grid-column: 1 / -1;
+    }
+
+    .model-details,
+    .architecture-card,
+    .probability-card,
+    .explanation-card {
+        margin-top: 0;
+    }
+
+    .output-grid {
+        grid-column: 1 / -1;
+    }
+}
+
+
+@media (max-width: 700px) {
+
+    header {
+        align-items: flex-start;
+
+        gap: 15px;
+    }
+
+    h1 {
+        font-size: 24px;
+    }
+
+    .input-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .video-stats {
+        grid-template-columns: 1fr;
+    }
+
+    .stat {
+        border-right: none;
+        border-bottom: 1px solid #282d34;
+    }
+
+    .stat:last-child {
+        border-bottom: none;
+    }
+
+    .image-area {
+        height: 350px;
+    }
+
+    .pipeline {
+        flex-direction: column;
+    }
+
+    .pipeline-step {
+        width: 100%;
+    }
+
+    .pipeline-arrow {
+        transform: rotate(90deg);
+    }
+
+    .playback-row {
+        flex-wrap: wrap;
+    }
+
+    .speed-control {
+        margin-left: 0;
+
+        padding-left: 10px;
+    }
+
+    .model-panel {
+        display: flex;
+
+        flex-direction: column;
+    }
+
+    .model-details,
+    .architecture-card,
+    .probability-card,
+    .explanation-card,
+    .output-grid {
+        margin-top: 0;
+    }
+
+    .output-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .output-box {
+        border-right: none;
+        border-bottom: 1px solid #282d34;
+    }
+
+    .output-box:last-child {
+        border-bottom: none;
+    }
+
+    footer {
+        flex-direction: column;
+
+        gap: 7px;
+    }
+}
