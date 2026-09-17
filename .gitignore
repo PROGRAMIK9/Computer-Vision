@@ -25,3 +25,5 @@ saved_models*/
 tests/
 sequence_*/
 video_*/
+
+yolo26*
