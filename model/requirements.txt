@@ -1,6 +1,8 @@
+opencv-python==4.11.0.86
 tensorflow[and-cuda]==2.19.0
 tensorflowjs
 kaggle
+kagglehub
 matplotlib
 seaborn
 scikit-learn
