@@ -26,4 +26,7 @@ tests/
 sequence_*/
 video_*/
 
-yolo26*
+
+runs
+yolo*.pt
+!weights/yolo26*

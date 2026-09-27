@@ -1,0 +1,387 @@
+<!doctype html>
+
+<html lang="en">
+  <head>
+    ```
+    <meta charset="UTF-8" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>V1.1 Object Detection + Anomaly Detection</title>
+
+    <link rel="stylesheet" href="/static/style.css" />
+    ```
+  </head>
+
+  <body>
+    <div class="app">
+      ```
+      <!-- ======================================================
+     Header
+     ====================================================== -->
+
+      <header>
+        <div class="header-left">
+          <div class="eyebrow">COMPUTER VISION · V1.1 MODEL</div>
+
+          <h1>Object Detection + Anomaly Detection</h1>
+
+          <p>
+            YOLO object detection combined with V1 frame-by-frame anomaly
+            analysis
+          </p>
+        </div>
+
+        <div class="model-badge">V1.1</div>
+      </header>
+
+      <!-- ======================================================
+     Main two-column layout
+     ====================================================== -->
+
+      <main>
+        <!-- ==================================================
+         LEFT: VIDEO / INPUT
+         ================================================== -->
+
+        <section class="panel video-panel">
+          <!-- Video controls -->
+
+          <div class="input-grid">
+            <div class="field">
+              <label> CATEGORY </label>
+
+              <select id="classSelect">
+                <option>Loading...</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label> VIDEO </label>
+
+              <select id="videoSelect">
+                <option>Loading...</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Image + YOLO overlay -->
+
+          <div class="image-area">
+            <div class="image-container">
+              <img id="frameImage" alt="Current video frame" />
+
+              <canvas id="detectionCanvas"></canvas>
+            </div>
+
+            <div id="loading" class="loading">Loading frame...</div>
+          </div>
+
+          <!-- Detection summary -->
+
+          <div class="detection-summary">
+            <div class="detection-summary-header">
+              <span> YOLO OBJECT DETECTION </span>
+
+              <strong id="objectCount"> 0 objects </strong>
+            </div>
+
+            <div id="detectionList" class="detection-list">
+              <span class="no-detections"> No objects detected </span>
+            </div>
+          </div>
+
+          <!-- Timeline -->
+
+          <div class="timeline-header">
+            <span> FRAME TIMELINE </span>
+
+            <span id="timelinePosition"> 0 / 0 </span>
+          </div>
+
+          <div class="timeline">
+            <input id="frameSlider" type="range" min="0" max="0" value="0" />
+          </div>
+
+          <!-- Playback -->
+
+          <div class="playback-row">
+            <button id="previousButton">◀</button>
+
+            <button id="playButton" class="play">▶ Play</button>
+
+            <button id="nextButton">▶</button>
+
+            <div class="speed-control">
+              <span> Speed </span>
+
+              <select id="speedSelect">
+                <option value="1000">0.5×</option>
+
+                <option value="500" selected>1×</option>
+
+                <option value="250">2×</option>
+
+                <option value="125">4×</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Video statistics -->
+
+          <div class="video-stats">
+            <div class="stat">
+              <span> Current Frame </span>
+
+              <strong id="frameNumber"> Frame 0 / 0 </strong>
+            </div>
+
+            <div class="stat">
+              <span> Source Frame </span>
+
+              <strong id="sourceFrame"> - </strong>
+            </div>
+
+            <div class="stat">
+              <span> Filename </span>
+
+              <strong id="filename" class="filename"> - </strong>
+            </div>
+          </div>
+
+          <!-- Input information -->
+
+          <div class="info-card">
+            <div class="info-title">V1.1 INPUT PIPELINE</div>
+
+            <div class="pipeline">
+              <div class="pipeline-step">
+                <span> SOURCE </span>
+
+                <strong> Original Frame </strong>
+              </div>
+
+              <div class="pipeline-arrow">→</div>
+
+              <div class="pipeline-step">
+                <span> OBJECT DETECTION </span>
+
+                <strong> YOLO26n </strong>
+              </div>
+
+              <div class="pipeline-arrow">+</div>
+
+              <div class="pipeline-step">
+                <span> ANOMALY DETECTION </span>
+
+                <strong> 224 × 224 </strong>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================================================
+         RIGHT: MODEL / OUTPUT
+         ================================================== -->
+
+        <section class="panel model-panel">
+          <div class="panel-header">
+            <div>
+              <div class="section-label">MODEL / OUTPUT</div>
+
+              <h2>V1.1 Combined Model</h2>
+            </div>
+
+            <div class="status">ACTIVE</div>
+          </div>
+
+          <!-- Current prediction -->
+
+          <div id="predictionCard" class="prediction-card">
+            <div class="prediction-caption">CURRENT ASSESSMENT</div>
+
+            <div id="predictionLabel" class="prediction-label">-</div>
+
+            <div id="confidence" class="confidence-caption">-</div>
+
+            <div class="confidence-caption">Anomaly Probability</div>
+          </div>
+
+          <!-- Model details -->
+
+          <div class="model-details">
+            <div class="detail">
+              <span> ANOMALY MODEL </span>
+
+              <strong> MobileNetV3Small </strong>
+            </div>
+
+            <div class="detail">
+              <span> OBJECT DETECTOR </span>
+
+              <strong> YOLO26n </strong>
+            </div>
+
+            <div class="detail">
+              <span> V1 INPUT </span>
+
+              <strong> 224 × 224 × 3 </strong>
+            </div>
+
+            <div class="detail">
+              <span> YOLO CLASSES </span>
+
+              <strong> 80 COCO Classes </strong>
+            </div>
+
+            <div class="detail">
+              <span> ANOMALY THRESHOLD </span>
+
+              <strong> 0.5000 </strong>
+            </div>
+
+            <div class="detail">
+              <span> YOLO CONFIDENCE </span>
+
+              <strong> 0.3500 </strong>
+            </div>
+          </div>
+
+          <!-- Architecture -->
+
+          <div class="architecture-card">
+            <div class="card-title">V1.1 INFERENCE PIPELINE</div>
+
+            <div class="architecture">
+              <div class="architecture-node">
+                <span> INPUT </span>
+
+                <strong> Original Video Frame </strong>
+              </div>
+
+              <div class="architecture-arrow">↓</div>
+
+              <div class="architecture-node">
+                <span> OBJECT DETECTION </span>
+
+                <strong> YOLO26n </strong>
+              </div>
+
+              <div class="architecture-arrow">+</div>
+
+              <div class="architecture-node">
+                <span> ANOMALY DETECTION </span>
+
+                <strong> MobileNetV3Small </strong>
+              </div>
+
+              <div class="architecture-arrow">↓</div>
+
+              <div class="architecture-node">
+                <span> COMBINED OUTPUT </span>
+
+                <strong> Objects + Normal / Anomaly </strong>
+              </div>
+            </div>
+          </div>
+
+          <!-- Model output -->
+
+          <div class="output-grid">
+            <div class="output-box">
+              <span> RAW MODEL OUTPUT </span>
+
+              <strong id="rawPrediction"> - </strong>
+            </div>
+
+            <div class="output-box">
+              <span> DECISION THRESHOLD </span>
+
+              <strong> 0.5000 </strong>
+            </div>
+
+            <div class="output-box">
+              <span> FINAL DECISION </span>
+
+              <strong id="decision"> - </strong>
+            </div>
+          </div>
+
+          <!-- Probabilities -->
+
+          <div class="probability-card">
+            <div class="card-title">ANOMALY CLASS PROBABILITIES</div>
+
+            <div class="probability-row">
+              <div class="probability-label">
+                <span> Normal </span>
+
+                <strong id="normalProbability"> - </strong>
+              </div>
+
+              <div class="probability-bar">
+                <div id="normalBar" class="probability-fill"></div>
+              </div>
+            </div>
+
+            <div class="probability-row">
+              <div class="probability-label">
+                <span> Anomaly </span>
+
+                <strong id="anomalyProbability"> - </strong>
+              </div>
+
+              <div class="probability-bar">
+                <div id="anomalyBar" class="probability-fill"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Explanation -->
+
+          <div class="explanation-card">
+            <div class="card-title">V1.1 BEHAVIOR</div>
+
+            <p>YOLO26n detects objects in the original video frame.</p>
+
+            <p>
+              The existing V1 MobileNetV3Small model independently evaluates the
+              same frame for anomaly probability.
+            </p>
+
+            <p class="highlight">
+              Object detection does not replace the V1 anomaly classifier.
+            </p>
+          </div>
+        </section>
+      </main>
+
+      <!-- ======================================================
+     Footer
+     ====================================================== -->
+
+      <footer>
+        <span> V1.1 · YOLO26n + MobileNetV3Small </span>
+
+        <span> Object detection + frame-by-frame anomaly detection </span>
+
+        <span> YOLO: 0.35 · Anomaly: 0.5 </span>
+      </footer>
+      ```
+    </div>
+
+    <!-- Compatibility elements used by app.js -->
+
+    <div style="display: none">
+      ```
+      <span id="sideClass"></span>
+
+      <span id="sideVideo"></span>
+
+      <span id="sideFrames"></span>
+      ```
+    </div>
+
+    <script src="/static/app.js"></script>
+  </body>
+</html>
