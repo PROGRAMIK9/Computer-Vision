@@ -1,0 +1,8 @@
+numpy>=1.24
+opencv-python>=4.8
+python-dotenv>=1.0
+fastapi>=0.115
+uvicorn[standard]>=0.30
+
+# Optional model inference dependencies. Install separately to avoid unnecessary ML/CUDA packages during camera setup:
+# pip install -r requirements-ml.txt

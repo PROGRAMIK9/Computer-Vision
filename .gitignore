@@ -30,3 +30,11 @@ video_*/
 runs
 yolo*.pt
 !weights/yolo26*
+
+__pycache__/
+*.py[cod]
+.venv/
+storage/events/*
+!storage/events/.gitkeep
+
+
