@@ -36,5 +36,6 @@ __pycache__/
 .venv/
 storage/events/*
 !storage/events/.gitkeep
+frontend/node_modules/
 
 
