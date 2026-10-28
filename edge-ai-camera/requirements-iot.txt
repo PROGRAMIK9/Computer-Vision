@@ -1,0 +1,4 @@
+# Install the standard project dependencies first with requirements.txt.
+# Picamera2 should be installed from Raspberry Pi OS (apt), not pip.
+# Optional model dependencies are in requirements-ml.txt.
+python-dotenv>=1.0

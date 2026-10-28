@@ -28,6 +28,8 @@ def _path(name: str, default: str) -> Path:
 class Settings:
     camera_source: str = os.getenv("CAMERA_SOURCE", "webcam").strip().lower()
     camera_index: int = int(os.getenv("CAMERA_INDEX", "0"))
+    pi_camera_width: int = max(160, int(os.getenv("PI_CAMERA_WIDTH", "640")))
+    pi_camera_height: int = max(120, int(os.getenv("PI_CAMERA_HEIGHT", "480")))
     phone_stream_url: str = os.getenv("PHONE_STREAM_URL", "http://127.0.0.1:8081/video")
     phone_rotation: int = int(os.getenv("PHONE_ROTATION", "0"))
     phone_flip: str = os.getenv("PHONE_FLIP", "none").strip().lower()

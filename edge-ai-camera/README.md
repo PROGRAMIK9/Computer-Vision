@@ -1,5 +1,7 @@
 # Edge AI Camera Monitoring
 
+For the Raspberry Pi camera implementation and setup instructions, see [Raspberry Pi Edge IoT](edge_iot/README.md). It uses this same API and dashboard.
+
 MVP for monitoring a laptop webcam or an Android phone camera. The laptop is the **edge processor**: it receives frames, detects motion, keeps a short in-memory frame buffer, runs the existing models only during motion, and saves only event video. FastAPI stores camera and event records in SQLite and receives completed event metadata/video. A React dashboard registers cameras and displays events.
 
 ## System flow

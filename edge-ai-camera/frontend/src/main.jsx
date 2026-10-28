@@ -34,18 +34,18 @@ function App() {
   return <main>
     <header><div><span className="eyebrow">LOCAL EDGE MONITORING</span><h1>Camera dashboard</h1></div><button onClick={refresh}>Refresh</button></header>
     <section className="grid">
-      <article><h2>Register a phone camera</h2>
-        <p>Registration creates the camera record. The phone sends its local stream directly to the laptop edge processor.</p>
+      <article><h2>Register an edge camera</h2>
+        <p>Register a Raspberry Pi camera or another edge camera. The edge device sends completed motion event videos and model results to this dashboard.</p>
         <form onSubmit={register}>
-          <label>Camera ID<input required pattern="[A-Za-z0-9_-]{1,80}" placeholder="phone-01" value={form.id} onChange={e=>setForm({...form,id:e.target.value})}/></label>
-          <label>Display name<input required placeholder="Front door phone" value={form.name} onChange={e=>setForm({...form,name:e.target.value})}/></label>
-          <label>Device ID (optional)<input placeholder="Android device name" value={form.device_id} onChange={e=>setForm({...form,device_id:e.target.value})}/></label>
+          <label>Camera ID<input required pattern="[A-Za-z0-9_-]{1,80}" placeholder="pi-camera-01" value={form.id} onChange={e=>setForm({...form,id:e.target.value})}/></label>
+          <label>Display name<input required placeholder="Entrance camera" value={form.name} onChange={e=>setForm({...form,name:e.target.value})}/></label>
+          <label>Device ID (optional)<input placeholder="Raspberry Pi hostname" value={form.device_id} onChange={e=>setForm({...form,device_id:e.target.value})}/></label>
           <button className="primary">Register camera</button>
         </form>{message && <p className="message">{message}</p>}
       </article>
       <article><h2>Registered cameras <small>({cameras.length})</small></h2>
         {cameras.length ? cameras.map(c=><div className="row" key={c.id}><div><b>{c.name}</b><small>{c.id} · {c.device_id || 'device id unavailable'}</small></div><span className={`pill ${c.status}`}>{c.status}</span></div>) : <p>No cameras registered yet.</p>}
-        <p className="hint">After registration, configure the matching CAMERA_ID and phone MJPEG URL in the edge processor’s .env.</p>
+        <p className="hint">After registration, configure the matching CAMERA_ID and backend LAN address in the Pi's edge-ai-camera/.env.</p>
       </article>
     </section>
     <section className="panel"><h2>Events <small>updates every 4 seconds</small></h2>
