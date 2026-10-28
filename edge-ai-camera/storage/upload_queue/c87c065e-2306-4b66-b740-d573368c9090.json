@@ -1,0 +1,13 @@
+{
+  "event_id": "c87c065e-2306-4b66-b740-d573368c9090",
+  "camera_id": "phone-01",
+  "camera_name": "Mobile1",
+  "started_at": "2026-09-28T17:53:30.185131+00:00",
+  "ended_at": "2026-09-28T17:53:34.234414+00:00",
+  "duration": 4.049,
+  "video_path": "/home/aaryamann/Projects/Computer-Vision/edge-ai-camera/storage/events/event_c87c065e-2306-4b66-b740-d573368c9090/video.mp4",
+  "frame_count": 141,
+  "detections": [],
+  "anomaly": null,
+  "created_at": "2026-09-28T17:53:34.636471+00:00"
+}

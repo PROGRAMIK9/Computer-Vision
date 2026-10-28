@@ -105,10 +105,14 @@ The MVP expects an MJPEG camera endpoint. Install an Android IP-camera app that 
    CAMERA_NAME=Front door phone
    PHONE_STREAM_URL=http://192.168.1.50:8080/video
    FPS=15
+   PHONE_ROTATION=0
+   PHONE_FLIP=none
    SHOW_PREVIEW=true
    ```
 
    Replace the example phone IP/port with the address shown in the Android camera app. `CAMERA_ID` must exactly match the ID registered on the website. Set `FPS` near the stream rate shown in the app so the five-second circular buffer represents about five seconds of footage.
+
+   Set the camera app to lock orientation if it has that option. MJPEG usually carries already-rendered pixels without orientation metadata, so the edge process cannot infer the phone sensor's intended orientation reliably. If the stream is consistently upside down, try `PHONE_ROTATION=180`; if it is consistently sideways, use `90` or `270`. `PHONE_FLIP` accepts `none`, `horizontal`, `vertical`, or `both`. These corrections run before motion detection and recording. If the phone changes between portrait and landscape during one event, saved video keeps a stable canvas and letterboxes the differently shaped frames instead of stretching them.
 
 4. Keep the phone app streaming, then run `python -m edge.main` from the project directory. The laptop opens the MJPEG URL, performs motion detection, and writes event video locally. The edge process sends completed events to FastAPI; the dashboard will show them after upload.
 
@@ -158,6 +162,8 @@ Restart the edge process. Inference results and YOLO detections are included in 
 
 SQLite stores camera, event, and detection rows. Event videos are saved under `storage/backend_media/`. Edge copies remain under `storage/events/`.
 
+The edge recorder writes OpenCV MP4 files. On upload or first playback, FastAPI converts them to browser-friendly H.264 MP4 and serves byte ranges so the browser can play/seek the file. This conversion uses the system `ffmpeg` and `ffprobe` commands; install FFmpeg on the backend machine if they are missing (Arch: `sudo pacman -S ffmpeg`; Debian/Ubuntu: `sudo apt install ffmpeg`). In the dashboard, **Open video** opens the event video endpoint in a new tab.
+
 ## Configuration reference
 
 | Variable | Default | Description |
@@ -167,6 +173,8 @@ SQLite stores camera, event, and detection rows. Event videos are saved under `s
 | `CAMERA_ID` | `webcam-01` | Must match a dashboard registration for phone events |
 | `CAMERA_NAME` | `Laptop webcam` | Display name attached to events |
 | `PHONE_STREAM_URL` | example URL | Android app's local MJPEG `/video` URL |
+| `PHONE_ROTATION` | `0` | Phone frame correction in degrees: `0`, `90`, `180`, `270` |
+| `PHONE_FLIP` | `none` | Optional correction: `none`, `horizontal`, `vertical`, `both` |
 | `FPS` | `30` | Webcam FPS hint and circular buffer sizing |
 | `BUFFER_SECONDS` | `5` | Pre-motion frame retention |
 | `MOTION_THRESHOLD` | `25` | Pixel-difference threshold |

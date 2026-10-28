@@ -29,6 +29,8 @@ class Settings:
     camera_source: str = os.getenv("CAMERA_SOURCE", "webcam").strip().lower()
     camera_index: int = int(os.getenv("CAMERA_INDEX", "0"))
     phone_stream_url: str = os.getenv("PHONE_STREAM_URL", "http://127.0.0.1:8081/video")
+    phone_rotation: int = int(os.getenv("PHONE_ROTATION", "0"))
+    phone_flip: str = os.getenv("PHONE_FLIP", "none").strip().lower()
     camera_id: str = os.getenv("CAMERA_ID", "webcam-01")
     camera_name: str = os.getenv("CAMERA_NAME", "Laptop webcam")
     fps: int = max(1, int(os.getenv("FPS", "30")))

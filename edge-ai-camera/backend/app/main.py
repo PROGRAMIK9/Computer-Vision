@@ -14,6 +14,7 @@ from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
 from edge.config import settings
+from backend.app.video import browser_mp4, range_file_response
 
 app = FastAPI(title="Edge AI Camera API", version="0.2.0")
 app.add_middleware(
@@ -207,18 +208,31 @@ async def upload_event_video(event_id: str, request: Request) -> dict[str, str]:
     data = await request.body()
     if not data:
         raise HTTPException(status_code=400, detail="Empty video upload")
-    video_path.write_bytes(data)
+    incoming_path = media_dir / "video.upload.mp4"
+    incoming_path.write_bytes(data)
+    try:
+        compatible_path = browser_mp4(incoming_path)
+        if compatible_path != video_path:
+            compatible_path.replace(video_path)
+        incoming_path.unlink(missing_ok=True)
+    except Exception:
+        incoming_path.unlink(missing_ok=True)
+        raise
     with _connect() as db:
         db.execute("UPDATE events SET video_path=? WHERE id=?", (str(video_path), event_id))
     return {"status": "stored", "event_id": event_id}
 
 
 @app.get("/api/events/{event_id}/video")
-def get_event_video(event_id: str):
+def get_event_video(event_id: str, request: Request):
     with _connect() as db:
         row = db.execute("SELECT video_path FROM events WHERE id=?", (event_id,)).fetchone()
         if row is None:
             raise HTTPException(status_code=404, detail="Event not found")
         if not row["video_path"] or not Path(row["video_path"]).is_file():
             raise HTTPException(status_code=404, detail="Event video not uploaded")
-        return FileResponse(row["video_path"], media_type="video/mp4", filename="video.mp4")
+        current_path = Path(row["video_path"])
+        compatible_path = browser_mp4(current_path)
+        if compatible_path != current_path:
+            db.execute("UPDATE events SET video_path=? WHERE id=?", (str(compatible_path), event_id))
+        return range_file_response(compatible_path, request)

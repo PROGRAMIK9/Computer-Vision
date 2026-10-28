@@ -21,6 +21,29 @@ def configure_logging() -> None:
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
 
 
+def orient_phone_frame(frame):
+    """Apply configured correction when a phone stream has a fixed rotation/flip."""
+    if settings.camera_source != "phone":
+        return frame
+    rotations = {
+        0: None,
+        90: cv2.ROTATE_90_CLOCKWISE,
+        180: cv2.ROTATE_180,
+        270: cv2.ROTATE_90_COUNTERCLOCKWISE,
+    }
+    rotation = settings.phone_rotation % 360
+    if rotation not in rotations:
+        raise ValueError("PHONE_ROTATION must be 0, 90, 180, or 270")
+    if rotations[rotation] is not None:
+        frame = cv2.rotate(frame, rotations[rotation])
+    flips = {"none": None, "horizontal": 1, "vertical": 0, "both": -1}
+    if settings.phone_flip not in flips:
+        raise ValueError("PHONE_FLIP must be none, horizontal, vertical, or both")
+    if flips[settings.phone_flip] is not None:
+        frame = cv2.flip(frame, flips[settings.phone_flip])
+    return frame
+
+
 def main() -> None:
     configure_logging()
     logger = logging.getLogger("edge")
@@ -59,6 +82,8 @@ def main() -> None:
                 logger.warning("Camera frame read failed; attempting source reconnect")
                 capture.reconnect(delay=1.0)
                 continue
+
+            frame = orient_phone_frame(frame)
 
             if settings.resize_width and frame.shape[1] > settings.resize_width:
                 height = round(frame.shape[0] * settings.resize_width / frame.shape[1])

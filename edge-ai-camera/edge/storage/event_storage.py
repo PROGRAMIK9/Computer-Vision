@@ -39,7 +39,19 @@ class EventStorage:
         try:
             for frame in frames:
                 if frame.shape[:2] != (height, width):
-                    frame = cv2.resize(frame, (width, height))
+                    # Phone MJPEG frames can switch between portrait and landscape.
+                    # Keep the event's encoded dimensions stable without stretching
+                    # or cropping any source frames.
+                    source_height, source_width = frame.shape[:2]
+                    scale = min(width / source_width, height / source_height)
+                    fitted_width = max(1, round(source_width * scale))
+                    fitted_height = max(1, round(source_height * scale))
+                    fitted = cv2.resize(frame, (fitted_width, fitted_height), interpolation=cv2.INTER_AREA)
+                    canvas = np.zeros((height, width, 3), dtype=frame.dtype)
+                    left = (width - fitted_width) // 2
+                    top = (height - fitted_height) // 2
+                    canvas[top:top + fitted_height, left:left + fitted_width] = fitted
+                    frame = canvas
                 writer.write(frame)
         finally:
             writer.release()
