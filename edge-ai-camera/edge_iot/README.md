@@ -34,7 +34,7 @@ Install Git, Python, USB-video/OpenCV support, and build tools:
 ```bash
 sudo apt update
 sudo apt install -y git python3 python3-venv python3-pip python3-opencv \
-  python3-numpy v4l-utils ffmpeg
+  python3-numpy python3-picamera2 v4l-utils ffmpeg
 ```
 
 Check the camera modes and capture a quick test frame (replace `/dev/video0` if needed):
@@ -104,8 +104,8 @@ Set the following values (replace the backend address with the backend computer'
 ```env
 CAMERA_SOURCE=webcam
 CAMERA_INDEX=0
-CAMERA_ID=pi-usb-01
-CAMERA_NAME=Logitech entrance camera
+CAMERA_ID=pi-usb-xx
+CAMERA_NAME=Logitech <....> camera
 BACKEND_URL=http://192.168.1.20:8000
 BACKEND_UPLOAD_ENABLED=true
 
@@ -115,7 +115,7 @@ RESIZE_WIDTH=640
 MOTION_THRESHOLD=25
 MIN_CONTOUR_AREA=800
 NO_MOTION_TIMEOUT=3.0
-SHOW_PREVIEW=false
+SHOW_PREVIEW=true
 
 INFERENCE_ENABLED=false
 INFERENCE_INTERVAL=0.5
@@ -127,7 +127,7 @@ YOLO_MODEL_PATH=../weights/yolo26n.pt
 
 Keep `INFERENCE_ENABLED=false` until the camera-only flow works and you have installed compatible TensorFlow and Ultralytics dependencies. Then switch it to `true`. To use the `s` model instead, set `YOLO_MODEL_PATH=../weights/yolo26s.pt`.
 
-The settings file is loaded by `edge/config.py`. Relative model paths are resolved from `edge-ai-camera`, with a fallback to the repository root, so these defaults work from the cloned repository layout.
+The settings file is loaded by `edge/config.py`. Relative model paths are resolved from `edge-ai-camera`, with a fallback to the repository root, so these defaults work from the cloned repository layout. `SHOW_PREVIEW=true` opens the live feed with motion boxes and recording status; press `q` in the preview window or Ctrl+C in the terminal to stop. Run from the Pi desktop session, not a text-only SSH session. OpenCV must include GUI support. This setup uses Raspberry Pi OS's `python3-opencv` package through `--system-site-packages`; avoid installing `opencv-python-headless` into that venv. If `cv2.imshow` still reports that the function is not implemented, check `python3 -c 'import cv2; print(cv2.__file__); print(cv2.getBuildInformation())'` and remove any pip OpenCV package shadowing the OS package (`python -m pip uninstall opencv-python opencv-python-headless`).
 
 ## 5. Start the backend and dashboard on another computer
 
@@ -159,7 +159,7 @@ python -m edge.main
 
 The app opens camera index 0, analyzes frames for motion, and retains the last five seconds in memory. When motion begins it writes an event video; after three quiet seconds it closes the event and queues its metadata/video for upload. Local event files are in `storage/events/`; uploads that fail are retained in `storage/upload_queue/` and retried. With inference enabled, both models are loaded once at process startup and predictions are sampled during active events. Press `Ctrl+C` to stop cleanly.
 
-Check `http://<backend-ip>:8000/api/health` from the Pi if uploads are not reaching the dashboard. Confirm the camera index and that `BACKEND_URL` is reachable. A headless Pi should use `SHOW_PREVIEW=false`.
+Check `http://<backend-ip>:8000/api/health` from the Pi if uploads are not reaching the dashboard. Confirm that `BACKEND_URL` is reachable. To run without a connected display, set `SHOW_PREVIEW=false`.
 
 ## Which code loads and runs the models?
 

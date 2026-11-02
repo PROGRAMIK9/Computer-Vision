@@ -22,6 +22,7 @@ __pycache__/
 test_models
 final_models*/
 saved_models*/
+edge-ai-camera/frontend/dist/
 tests/
 sequence_*/
 video_*/

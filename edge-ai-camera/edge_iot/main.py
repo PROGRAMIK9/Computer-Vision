@@ -36,6 +36,9 @@ def main() -> None:
 
     inference = None
     if settings.inference_enabled:
+        logger.info("Inference enabled: anomaly model=%s (threshold=%.2f), YOLO model=%s (confidence=%.2f)",
+                    settings.resolve_project_path(settings.anomaly_model_path), settings.anomaly_threshold,
+                    settings.resolve_project_path(settings.yolo_model_path), settings.yolo_confidence)
         inference = ModelInference(
             settings.resolve_project_path(settings.anomaly_model_path),
             settings.resolve_project_path(settings.yolo_model_path),
@@ -52,6 +55,8 @@ def main() -> None:
                 "enabled during motion" if inference else "disabled")
     logger.info("Events start at detected motion and close after %.1fs without motion",
                 settings.no_motion_timeout)
+    if settings.show_preview:
+        logger.info("Showing live camera preview; press q in the preview window or Ctrl+C to stop")
 
     try:
         while True:
@@ -65,7 +70,7 @@ def main() -> None:
                 height = round(frame.shape[0] * settings.resize_width / frame.shape[1])
                 frame = cv2.resize(frame, (settings.resize_width, height))
 
-            motion, _ = detector.detect(frame)
+            motion, boxes = detector.detect(frame)
             manager.update(frame, motion, [])
             now = time.monotonic()
 
@@ -86,6 +91,27 @@ def main() -> None:
                 future_event = manager.event_token
                 last_inference = now
 
+            if settings.show_preview:
+                preview = frame.copy()
+                for x, y, width, height in boxes:
+                    cv2.rectangle(preview, (x, y), (x + width, y + height), (0, 220, 0), 2)
+                status = "RECORDING" if manager.recording else ("MOTION" if motion else "IDLE")
+                color = (0, 0, 255) if manager.recording else (0, 220, 0)
+                cv2.putText(preview, status, (12, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.8, color, 2)
+                if inference and manager.recording:
+                    anomaly = manager.latest_anomaly
+                    status_text = "ML: warming up" if anomaly is None else (
+                        f"ML: {anomaly['label']} ({anomaly['anomaly_probability']:.2f})"
+                    )
+                    cv2.putText(preview, status_text, (12, 60), cv2.FONT_HERSHEY_SIMPLEX,
+                                0.55, (255, 200, 0), 2)
+                    if anomaly is not None:
+                        logger.info("Anomaly score %.3f -> %s (threshold %.2f)",
+                                    anomaly["anomaly_probability"], anomaly["label"], anomaly["threshold"])
+                cv2.imshow("Edge AI Camera - Raspberry Pi", preview)
+                if cv2.waitKey(1) & 0xFF == ord("q"):
+                    break
+
     except KeyboardInterrupt:
         logger.info("Stopping on keyboard interrupt")
     finally:
@@ -94,6 +120,8 @@ def main() -> None:
         uploader.stop()
         if executor:
             executor.shutdown(wait=False, cancel_futures=True)
+        if settings.show_preview:
+            cv2.destroyAllWindows()
 
 
 if __name__ == "__main__":
