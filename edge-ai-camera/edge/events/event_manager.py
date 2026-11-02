@@ -37,7 +37,8 @@ class EventManager:
     def event_token(self) -> str | None:
         return self._started_at.isoformat() if self._started_at else None
 
-    def update(self, frame: np.ndarray, motion: bool, pre_roll: list[np.ndarray]) -> None:
+    def update(self, frame: np.ndarray, motion: bool, pre_roll: list[np.ndarray],
+               defer_completion_seconds: float = 0.0) -> None:
         now = datetime.now(timezone.utc)
         if motion:
             if self._frames is None:
@@ -48,8 +49,10 @@ class EventManager:
             self._last_motion = now
         elif self._frames is not None:
             self._frames.append(frame.copy())
-            if self._last_motion and (now - self._last_motion).total_seconds() >= self.no_motion_timeout:
-                self._complete(now)
+            if self._last_motion:
+                quiet_seconds = (now - self._last_motion).total_seconds()
+                if quiet_seconds >= self.no_motion_timeout + max(0.0, defer_completion_seconds):
+                    self._complete(now)
 
     def add_inference(self, result: dict[str, Any], timestamp: datetime | None = None) -> None:
         """Attach one throttled model result to the active motion event."""
@@ -57,13 +60,18 @@ class EventManager:
             return
         timestamp = timestamp or datetime.now(timezone.utc)
         if "anomaly_probability" in result:
-            self._latest_anomaly = {
+            candidate = {
                 "anomaly_probability": result["anomaly_probability"],
                 "normal_probability": result["normal_probability"],
                 "label": result["label"],
                 "threshold": result["threshold"],
                 "timestamp": timestamp.isoformat(),
             }
+            # The event label should represent its strongest frame, not the last
+            # quiet/normal frame sampled before the event closed.
+            if (self._latest_anomaly is None
+                    or candidate["anomaly_probability"] > self._latest_anomaly["anomaly_probability"]):
+                self._latest_anomaly = candidate
         for detection in result.get("detections", []):
             self._detections.append({**detection, "timestamp": timestamp.isoformat()})
 

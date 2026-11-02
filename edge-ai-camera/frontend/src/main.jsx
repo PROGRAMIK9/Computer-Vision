@@ -139,7 +139,7 @@ function App() {
       </>}
 
       {page === 'anomalies' && <>
-        <section className="page-heading"><div><div className="eyebrow">EVENT REVIEW</div><h1>Model flagged</h1><p>Events the camera model marked as unusual. Open a recording to review it.</p></div>
+        <section className="page-heading"><div><div className="eyebrow">EVENT REVIEW</div><h1>Model flagged</h1><p>Events where at least one sampled frame crossed the anomaly threshold. Open a recording to review it.</p></div>
           <div className="anomaly-total"><strong>{anomalies.length}</strong><span>flagged events</span></div></section>
         <section className="filter-bar">
           <label>Model tag<select value={anomalyFilter} onChange={event => setAnomalyFilter(event.target.value)}><option value="all">All model tags</option><option value="ANOMALY">Anomaly</option><option value="NORMAL">Normal</option></select></label>
@@ -211,7 +211,7 @@ function AnomalyCard({ event, onSelect }) {
   const detections = [...new Set((event.detections || []).map(item => item.class_name))];
   return <article className="anomaly-card"><div className="anomaly-accent"/><div className="anomaly-card-main"><div className="anomaly-card-head"><div><ModelTag anomaly={event.anomaly} large/><span className="camera-name">{event.camera_name || event.camera_id}</span></div>
       <div className="anomaly-time">{formatDate(event.started_at)}</div></div>
-    <div className="score-line"><span>Anomaly score</span><b>{score.toFixed(3)}</b><div className="score-track"><i style={{ width: `${Math.max(0, Math.min(100, score * 100))}%` }}/></div><small>threshold {Number(event.anomaly.threshold ?? 0.5).toFixed(2)}</small></div>
+    <div className="score-line"><span>Peak anomaly score</span><b>{score.toFixed(3)}</b><div className="score-track"><i style={{ width: `${Math.max(0, Math.min(100, score * 100))}%` }}/></div><small>threshold {Number(event.anomaly.threshold ?? 0.5).toFixed(2)}</small></div>
     <div className="anomaly-card-foot"><span>{Number(event.duration || 0).toFixed(1)} sec · Camera {event.camera_id}</span><span>{detections.length ? `Objects: ${detections.join(', ')}` : 'No objects detected'}</span>
       <button className="button" onClick={() => onSelect(event)}>Review event <span>→</span></button></div></div>
     {event.video_available && <a className="video-link" href={`${API}/api/events/${event.event_id}/video`} target="_blank" rel="noreferrer" aria-label="Open event video">▶</a>}
@@ -226,7 +226,7 @@ function EventModal({ event, onClose }) {
   return <div className="modal" onClick={onClose}><article className="event-modal" onClick={e=>e.stopPropagation()}><button className="modal-close" onClick={onClose}>×</button>
     <div className="eyebrow">EVENT REVIEW</div><h2>{event.camera_name || event.camera_id}</h2><p className="modal-subtitle">{formatDate(event.started_at)} · {Number(event.duration || 0).toFixed(1)} seconds</p>
     <div className="modal-tag-row"><span>ON-DEVICE MODEL TAG</span><ModelTag anomaly={event.anomaly} large/></div>
-    {event.anomaly && <div className="modal-score">Anomaly score <b>{Number(event.anomaly.anomaly_probability).toFixed(3)}</b><span>Threshold {Number(event.anomaly.threshold ?? 0.5).toFixed(2)}</span></div>}
+    {event.anomaly && <div className="modal-score">Peak anomaly score <b>{Number(event.anomaly.anomaly_probability).toFixed(3)}</b><span>Threshold {Number(event.anomaly.threshold ?? 0.5).toFixed(2)}</span></div>}
     {event.video_available ? <video className="event-video" controls preload="metadata" src={`${API}/api/events/${event.event_id}/video`}/> : <div className="video-unavailable">No video uploaded with this event.</div>}
     <div className="modal-section"><h3>Detected objects</h3>{event.detections?.length ? event.detections.map((detection, index) => <div className="detection-row" key={`${detection.class_name}-${index}`}><span>{detection.class_name}</span><b>{(Number(detection.confidence) * 100).toFixed(0)}%</b><small>{formatDate(detection.timestamp)}</small></div>) : <p>No object detections attached.</p>}</div>
     <div className="modal-event-id">Event ID <code>{event.event_id}</code></div>

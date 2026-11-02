@@ -7,8 +7,10 @@ option registration while preserving the existing model files and outputs.
 
 import logging
 import multiprocessing as mp
+import os
 import time
 import traceback
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 from typing import Any, Callable
 
@@ -20,8 +22,15 @@ logger = logging.getLogger(__name__)
 def _anomaly_worker(connection, model_path: str, threshold: float) -> None:
     """Child process entry point; only this process imports TensorFlow."""
     try:
+        os.environ.setdefault("OMP_NUM_THREADS", "1")
+        os.environ.setdefault("OPENBLAS_NUM_THREADS", "1")
+        os.environ.setdefault("TF_NUM_INTRAOP_THREADS", "1")
+        os.environ.setdefault("TF_NUM_INTEROP_THREADS", "1")
         import cv2
         import tensorflow as tf
+
+        tf.config.threading.set_intra_op_parallelism_threads(1)
+        tf.config.threading.set_inter_op_parallelism_threads(1)
 
         for gpu in tf.config.list_physical_devices("GPU"):
             try:
@@ -58,7 +67,13 @@ def _anomaly_worker(connection, model_path: str, threshold: float) -> None:
 def _yolo_worker(connection, model_path: str, confidence: float) -> None:
     """Child process entry point; only this process imports PyTorch/Ultralytics."""
     try:
+        os.environ.setdefault("OMP_NUM_THREADS", "1")
+        os.environ.setdefault("OPENBLAS_NUM_THREADS", "1")
         from ultralytics import YOLO
+        import torch
+
+        torch.set_num_threads(1)
+        torch.set_num_interop_threads(1)
 
         model = YOLO(model_path)
         connection.send(("ready", None))
@@ -98,7 +113,7 @@ class _ModelWorker:
         self.process.start()
         child.close()
         try:
-            self._wait_for_message(expected="ready", timeout=180)
+            self._wait_for_message(expected="ready", timeout=90)
         except BaseException:
             self.close()
             raise
@@ -132,7 +147,15 @@ class _ModelWorker:
             self.connection.send(frame)
         except (BrokenPipeError, EOFError, OSError) as exc:
             raise RuntimeError(f"Could not send frame to {self.name} worker") from exc
-        return self._wait_for_message(expected="result")
+        try:
+            return self._wait_for_message(expected="result", timeout=20)
+        except Exception:
+            # A wedged/aborted native runtime must not stall event capture forever.
+            if self.process.is_alive():
+                self.process.terminate()
+                self.process.join(timeout=2)
+            self.connection.close()
+            raise
 
     def close(self) -> None:
         if self.process.is_alive():
@@ -162,6 +185,7 @@ class ModelInference:
         self._workers: list[_ModelWorker] = []
         self._anomaly_worker: _ModelWorker | None = None
         self._yolo_worker: _ModelWorker | None = None
+        self._worker_executor = ThreadPoolExecutor(max_workers=2, thread_name_prefix="model-worker-call")
 
     def load(self) -> None:
         if not self.anomaly_enabled and not self.yolo_enabled:
@@ -171,34 +195,55 @@ class ModelInference:
         if self.yolo_enabled and not self.yolo_model_path.is_file():
             raise FileNotFoundError(f"YOLO model not found: {self.yolo_model_path}")
 
-        try:
-            if self.anomaly_enabled:
+        startup_errors = []
+        if self.anomaly_enabled:
+            try:
                 logger.info("Starting isolated anomaly worker: %s", self.anomaly_model_path)
                 self._anomaly_worker = _ModelWorker(
                     "anomaly", _anomaly_worker,
                     (str(self.anomaly_model_path), self.anomaly_threshold),
                 )
                 self._workers.append(self._anomaly_worker)
-            if self.yolo_enabled:
+            except Exception as exc:
+                startup_errors.append(f"anomaly: {exc}")
+                logger.exception("Anomaly worker startup failed; continuing with other enabled models")
+        if self.yolo_enabled:
+            try:
                 logger.info("Starting isolated YOLO worker: %s", self.yolo_model_path)
                 self._yolo_worker = _ModelWorker(
                     "YOLO", _yolo_worker,
                     (str(self.yolo_model_path), self.yolo_confidence),
                 )
                 self._workers.append(self._yolo_worker)
-        except BaseException:
+            except Exception as exc:
+                startup_errors.append(f"YOLO: {exc}")
+                logger.exception("YOLO worker startup failed; continuing with other enabled models")
+        if not self._workers:
             self.close()
-            raise
+            raise RuntimeError("No inference workers started: " + "; ".join(startup_errors))
 
     def predict(self, frame: np.ndarray) -> dict[str, Any]:
         result: dict[str, Any] = {"detections": []}
+        pending = {}
         if self._anomaly_worker is not None:
-            result.update(self._anomaly_worker.predict(frame))
+            pending[self._worker_executor.submit(self._anomaly_worker.predict, frame)] = "anomaly"
         if self._yolo_worker is not None:
-            result.update(self._yolo_worker.predict(frame))
+            pending[self._worker_executor.submit(self._yolo_worker.predict, frame)] = "YOLO"
+
+        for future in as_completed(pending):
+            name = pending[future]
+            try:
+                result.update(future.result())
+            except Exception as exc:
+                result.setdefault("errors", []).append(f"{name}: {exc}")
+                if name == "anomaly":
+                    self._anomaly_worker = None
+                else:
+                    self._yolo_worker = None
         return result
 
     def close(self) -> None:
+        self._worker_executor.shutdown(wait=False, cancel_futures=True)
         for worker in reversed(self._workers):
             worker.close()
         self._workers.clear()

@@ -118,6 +118,9 @@ MOTION_THRESHOLD=25
 MIN_CONTOUR_AREA=800
 NO_MOTION_TIMEOUT=3.0
 SHOW_PREVIEW=false
+PREVIEW_SERVER_ENABLED=true
+PREVIEW_HOST=0.0.0.0
+PREVIEW_PORT=8765
 
 INFERENCE_ENABLED=false
 INFERENCE_INTERVAL=0.5
@@ -131,7 +134,9 @@ YOLO_MODEL_PATH=../weights/yolo26n.pt
 
 Keep `INFERENCE_ENABLED=false` until the camera-only flow works and you have installed compatible TensorFlow and Ultralytics dependencies. Then switch it to `true`. TensorFlow/Keras and YOLO/PyTorch now run in separate child processes to prevent LLVM option-registration conflicts. The `ANOMALY_INFERENCE_ENABLED` and `YOLO_INFERENCE_ENABLED` switches still let you run either model alone. Separate workers use more RAM, so watch memory on the Pi 4 and prefer `yolo26n.pt`. To use the `s` detector instead, set `YOLO_MODEL_PATH=../weights/yolo26s.pt`.
 
-The settings file is loaded by `edge/config.py`. Relative model paths are resolved from `edge-ai-camera`, with a fallback to the repository root, so these defaults work from the cloned repository layout. Keep `SHOW_PREVIEW=false` for headless OpenCV or when running over SSH; this avoids calling unsupported `cv2.imshow` and `cv2.destroyAllWindows` functions. Event clips are saved locally and, when the backend is reachable, uploaded to the dashboard after each event ends. To show a local preview window, set `SHOW_PREVIEW=true` only in a graphical Pi desktop session and use GUI-enabled OpenCV. If `cv2.imshow` still reports that the function is not implemented, check `python3 -c 'import cv2; print(cv2.__file__); print(cv2.getBuildInformation())'` and remove any pip OpenCV package shadowing the OS package (`python -m pip uninstall opencv-python opencv-python-headless`).
+The settings file is loaded by `edge/config.py`. Relative model paths are resolved from `edge-ai-camera`, with a fallback to the repository root. Keep `SHOW_PREVIEW=false` for headless OpenCV or when running over SSH. Set `PREVIEW_SERVER_ENABLED=true` to view the live USB camera in a browser on the LAN: get the Pi address with `hostname -I`, then open `http://<pi-ip>:8765/` from the backend computer. This preview is separate from the dashboard and does not require OpenCV GUI support. If the Pi firewall is enabled, allow TCP port 8765. To show a local window instead, set `SHOW_PREVIEW=true` only in a graphical Pi desktop session with GUI-enabled OpenCV.
+
+The event's anomaly score is the highest probability returned for any sampled frame during that event. This prevents a later quiet/normal frame from overwriting an earlier anomalous result. Existing events are not recalculated; this aggregation applies to events generated after updating the Pi code.
 
 ## 5. Start the backend and dashboard on another computer
 
@@ -161,7 +166,7 @@ source .venv/bin/activate
 python -m edge.main
 ```
 
-The app opens camera index 0, analyzes frames for motion, and retains the last five seconds in memory. When motion begins it writes an event video; after three quiet seconds it closes the event and queues its metadata/video for upload. Local event files are in `storage/events/`; uploads that fail are retained in `storage/upload_queue/` and retried. With inference enabled, both models are loaded once at process startup and predictions are sampled during active events. Press `Ctrl+C` to stop cleanly.
+The app opens camera index 0 and starts motion capture immediately. Enabled models load in the background so slow model startup does not block the camera loop. During active events, anomaly and YOLO inference run concurrently in separate processes. Each inference request is capped at 20 seconds; a failed or unresponsive model is disabled for that run, while the other model and camera recording continue. Local event files are in `storage/events/`; uploads that fail are retained in `storage/upload_queue/` and retried. Press `Ctrl+C` to stop cleanly.
 
 Check `http://<backend-ip>:8000/api/health` from the Pi if uploads are not reaching the dashboard. Confirm that `BACKEND_URL` is reachable. To run without a connected display, set `SHOW_PREVIEW=false`.
 
@@ -173,7 +178,7 @@ The Pi entry point is:
 edge-ai-camera/edge/main.py
 ```
 
-When `INFERENCE_ENABLED=true`, it creates `ModelInference` and calls `load()` before entering the camera loop. [The inference adapter](../edge/inference/model.py) loads the Keras model with `tf.keras.models.load_model(...)` and the YOLO model with `YOLO(...)`. During motion events, `predict()` sends sampled frames to both models. Results are added to event metadata and uploaded with the event. The default is disabled, so set it explicitly to true to run model inference on the Pi.
+When `INFERENCE_ENABLED=true`, it creates `ModelInference`; [the inference adapter](../edge/inference/model.py) starts independent TensorFlow and YOLO worker processes in the background. During motion events, sampled frames go to both workers concurrently. Successful model results are retained even if the other worker fails, then added to event metadata and uploaded with the event. The default is disabled, so set it explicitly to true in the Pi's `.env` to run model inference.
 
 ## Optional: start automatically after reboot
 
@@ -209,6 +214,8 @@ journalctl -u edge-camera -f
 ## Troubleshooting
 
 - **OpenCV `cv2.imshow` / `destroyAllWindows` says the function is not implemented:** set `SHOW_PREVIEW=false` in `.env` and restart. Headless OpenCV cannot open a window, but camera capture, motion detection, event recording, and inference can run without preview.
+- **Want a live preview over SSH:** set `PREVIEW_SERVER_ENABLED=true`, restart `python -m edge.main`, then open `http://<pi-ip>:8765/` in a browser on the LAN. If it cannot connect, check the Pi firewall and allow TCP 8765.
+- **Model workers load but no results appear:** confirm logs show both `anomaly worker ready` and `YOLO worker ready`, then wait for `Inference complete` during motion. Worker errors/timeouts are logged separately; results appear in event details after the event closes and uploads. Old uploaded events are not reprocessed.
 - **`Could not open camera source 0`:** inspect `/dev/video*`, check `v4l2-ctl`, permissions/group membership, and try another `CAMERA_INDEX`.
 - **No event video:** verify that motion fills enough pixels to exceed `MIN_CONTOUR_AREA`; lower it for a distant/small subject. Adjust `MOTION_THRESHOLD` for lighting changes.
 - **No dashboard event:** check `BACKEND_URL`, backend health endpoint, LAN firewall, and local pending files in `storage/upload_queue/`.

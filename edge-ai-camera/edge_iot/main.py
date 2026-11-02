@@ -73,7 +73,6 @@ def main() -> None:
                 frame = cv2.resize(frame, (settings.resize_width, height))
 
             motion, boxes = detector.detect(frame)
-            manager.update(frame, motion, [])
             now = time.monotonic()
 
             if future is not None and future.done():
@@ -81,11 +80,20 @@ def main() -> None:
                     result = future.result()
                     if manager.recording and manager.event_token == future_event:
                         manager.add_inference(result, datetime.now(timezone.utc))
+                        anomaly = result.get("label")
+                        score = result.get("anomaly_probability")
+                        logger.info("Inference complete: anomaly=%s score=%s, YOLO detections=%d",
+                                    anomaly if anomaly is not None else "disabled",
+                                    f"{score:.3f}" if score is not None else "n/a",
+                                    len(result.get("detections", [])))
                 except Exception:
                     logger.exception("Inference failed for a sampled event frame")
                 finally:
                     future = None
                     future_event = None
+
+            # Keep the event open until its outstanding model result is attached.
+            manager.update(frame, motion, [], defer_completion_seconds=22.0 if future is not None else 0.0)
 
             if (inference and executor and manager.recording and future is None
                     and now - last_inference >= settings.inference_interval):
