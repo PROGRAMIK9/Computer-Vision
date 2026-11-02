@@ -46,6 +46,8 @@ class Settings:
     video_fourcc: str = os.getenv("VIDEO_FOURCC", "mp4v")
     show_preview: bool = _bool("SHOW_PREVIEW", True)
     inference_enabled: bool = _bool("INFERENCE_ENABLED", False)
+    anomaly_inference_enabled: bool = _bool("ANOMALY_INFERENCE_ENABLED", True)
+    yolo_inference_enabled: bool = _bool("YOLO_INFERENCE_ENABLED", True)
     inference_interval: float = max(0.1, float(os.getenv("INFERENCE_INTERVAL", "0.2")))
     anomaly_threshold: float = float(os.getenv("ANOMALY_THRESHOLD", "0.5"))
     yolo_confidence: float = float(os.getenv("YOLO_CONFIDENCE", "0.35"))

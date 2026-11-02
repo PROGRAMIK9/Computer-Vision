@@ -44,6 +44,8 @@ def main() -> None:
             settings.resolve_project_path(settings.yolo_model_path),
             settings.anomaly_threshold,
             settings.yolo_confidence,
+            settings.anomaly_inference_enabled,
+            settings.yolo_inference_enabled,
         )
         inference.load()
 
@@ -119,7 +121,9 @@ def main() -> None:
         capture.release()
         uploader.stop()
         if executor:
-            executor.shutdown(wait=False, cancel_futures=True)
+            executor.shutdown(wait=True, cancel_futures=True)
+        if inference:
+            inference.close()
         if settings.show_preview:
             cv2.destroyAllWindows()
 

@@ -56,13 +56,14 @@ class EventManager:
         if not self.recording:
             return
         timestamp = timestamp or datetime.now(timezone.utc)
-        self._latest_anomaly = {
-            "anomaly_probability": result["anomaly_probability"],
-            "normal_probability": result["normal_probability"],
-            "label": result["label"],
-            "threshold": result["threshold"],
-            "timestamp": timestamp.isoformat(),
-        }
+        if "anomaly_probability" in result:
+            self._latest_anomaly = {
+                "anomaly_probability": result["anomaly_probability"],
+                "normal_probability": result["normal_probability"],
+                "label": result["label"],
+                "threshold": result["threshold"],
+                "timestamp": timestamp.isoformat(),
+            }
         for detection in result.get("detections", []):
             self._detections.append({**detection, "timestamp": timestamp.isoformat()})
 

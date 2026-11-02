@@ -129,7 +129,7 @@ The models are the same assets used by `v1.1_demo`:
 ../weights/yolo26s.pt
 ```
 
-MobileNetV3Small outputs an `ANOMALY` probability (0.5 threshold); YOLO26s reports object labels, confidence, and bounding boxes. Both run only after motion starts, by default at up to five samples per second.
+MobileNetV3Small outputs an `ANOMALY` probability (0.5 threshold); YOLO26s reports object labels, confidence, and bounding boxes. Both run only after motion starts, by default at up to five samples per second. TensorFlow and PyTorch inference run in separate worker processes to avoid native LLVM library conflicts on ARM devices.
 
 Install model requirements separately after webcam/phone streaming works:
 

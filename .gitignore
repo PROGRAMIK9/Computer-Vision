@@ -38,3 +38,4 @@ __pycache__/
 storage/events/*
 !storage/events/.gitkeep
 node_modules/
+edge-ai-camera/storage/backend.db

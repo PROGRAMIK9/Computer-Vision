@@ -67,6 +67,8 @@ python -m pip install -r requirements-iot.txt
 
 `--system-site-packages` lets this environment use Debian/Raspberry Pi OS OpenCV and NumPy while installing this app's small Python dependencies. This Pi camera app uses a USB camera, so it does **not** require Picamera2. Do not use `edge_iot.main` for the Logitech camera; that entry point is specifically for CSI Pi Camera modules.
 
+The USB-camera path also works with a headless OpenCV build, but it cannot display a local window. For pip-based headless installs, use `opencv-python-headless`; do not install both `opencv-python` and `opencv-python-headless` because both provide `cv2`. The apt-installed `python3-opencv` above is fine when the venv uses `--system-site-packages` and no pip OpenCV package shadows it.
+
 ## 3. Put the model files on the Pi
 
 The defaults point outside `edge-ai-camera` to these files in the repository:
@@ -115,19 +117,21 @@ RESIZE_WIDTH=640
 MOTION_THRESHOLD=25
 MIN_CONTOUR_AREA=800
 NO_MOTION_TIMEOUT=3.0
-SHOW_PREVIEW=true
+SHOW_PREVIEW=false
 
 INFERENCE_ENABLED=false
 INFERENCE_INTERVAL=0.5
+ANOMALY_INFERENCE_ENABLED=true
+YOLO_INFERENCE_ENABLED=true
 ANOMALY_THRESHOLD=0.5
 YOLO_CONFIDENCE=0.35
 ANOMALY_MODEL_PATH=../tested_models/7_train_7_finetune/model_final.keras
 YOLO_MODEL_PATH=../weights/yolo26n.pt
 ```
 
-Keep `INFERENCE_ENABLED=false` until the camera-only flow works and you have installed compatible TensorFlow and Ultralytics dependencies. Then switch it to `true`. To use the `s` model instead, set `YOLO_MODEL_PATH=../weights/yolo26s.pt`.
+Keep `INFERENCE_ENABLED=false` until the camera-only flow works and you have installed compatible TensorFlow and Ultralytics dependencies. Then switch it to `true`. TensorFlow/Keras and YOLO/PyTorch now run in separate child processes to prevent LLVM option-registration conflicts. The `ANOMALY_INFERENCE_ENABLED` and `YOLO_INFERENCE_ENABLED` switches still let you run either model alone. Separate workers use more RAM, so watch memory on the Pi 4 and prefer `yolo26n.pt`. To use the `s` detector instead, set `YOLO_MODEL_PATH=../weights/yolo26s.pt`.
 
-The settings file is loaded by `edge/config.py`. Relative model paths are resolved from `edge-ai-camera`, with a fallback to the repository root, so these defaults work from the cloned repository layout. `SHOW_PREVIEW=true` opens the live feed with motion boxes and recording status; press `q` in the preview window or Ctrl+C in the terminal to stop. Run from the Pi desktop session, not a text-only SSH session. OpenCV must include GUI support. This setup uses Raspberry Pi OS's `python3-opencv` package through `--system-site-packages`; avoid installing `opencv-python-headless` into that venv. If `cv2.imshow` still reports that the function is not implemented, check `python3 -c 'import cv2; print(cv2.__file__); print(cv2.getBuildInformation())'` and remove any pip OpenCV package shadowing the OS package (`python -m pip uninstall opencv-python opencv-python-headless`).
+The settings file is loaded by `edge/config.py`. Relative model paths are resolved from `edge-ai-camera`, with a fallback to the repository root, so these defaults work from the cloned repository layout. Keep `SHOW_PREVIEW=false` for headless OpenCV or when running over SSH; this avoids calling unsupported `cv2.imshow` and `cv2.destroyAllWindows` functions. Event clips are saved locally and, when the backend is reachable, uploaded to the dashboard after each event ends. To show a local preview window, set `SHOW_PREVIEW=true` only in a graphical Pi desktop session and use GUI-enabled OpenCV. If `cv2.imshow` still reports that the function is not implemented, check `python3 -c 'import cv2; print(cv2.__file__); print(cv2.getBuildInformation())'` and remove any pip OpenCV package shadowing the OS package (`python -m pip uninstall opencv-python opencv-python-headless`).
 
 ## 5. Start the backend and dashboard on another computer
 
@@ -204,6 +208,7 @@ journalctl -u edge-camera -f
 
 ## Troubleshooting
 
+- **OpenCV `cv2.imshow` / `destroyAllWindows` says the function is not implemented:** set `SHOW_PREVIEW=false` in `.env` and restart. Headless OpenCV cannot open a window, but camera capture, motion detection, event recording, and inference can run without preview.
 - **`Could not open camera source 0`:** inspect `/dev/video*`, check `v4l2-ctl`, permissions/group membership, and try another `CAMERA_INDEX`.
 - **No event video:** verify that motion fills enough pixels to exceed `MIN_CONTOUR_AREA`; lower it for a distant/small subject. Adjust `MOTION_THRESHOLD` for lighting changes.
 - **No dashboard event:** check `BACKEND_URL`, backend health endpoint, LAN firewall, and local pending files in `storage/upload_queue/`.
