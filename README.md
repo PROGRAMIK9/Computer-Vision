@@ -1,5 +1,7 @@
 Yes. For the **current V2 work**, I'd remove all the V1/demo material and keep the README focused on the new pipeline.
 
+#
+
 # Computer Vision — Anomaly Detection System
 
 Computer-vision subsystem for a surveillance-based anomaly detection system.
